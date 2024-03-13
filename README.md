@@ -1,2 +1,2 @@
-# netology_cpp_homework
+# NETOLOGY **cpp homework**
 Netology CPP course homework compilation
