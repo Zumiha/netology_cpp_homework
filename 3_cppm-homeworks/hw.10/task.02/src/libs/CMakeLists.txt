@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.18.0)
+project(LIBEARCHY VERSION 0.2)
+set(SOURCE_LIB 0_Figure.cpp 01.0_triangle.cpp 02.0_quadri.cpp 01.1_rt.cpp 01.2_io.cpp 01.3_et.cpp 02.1.0_paral.cpp 02.1.1_rhomb.cpp 02.1.2.0_rect.cpp 02.1.2.1_squire.cpp)
+set(SOURCE_HD 0_Figure.h 01.0_triangle.h 02.0_quadri.h 01.1_rt.h 01.2_io.h 01.3_et.h 02.1.0_paral.h 02.1.1_rhomb.h 02.1.2.0_rect.h 02.1.2.1_squire.h)
+add_library(LIBEARCHY ${SOURCE_LIB} ${SOURCE_HD})
