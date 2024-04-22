@@ -1,0 +1,5 @@
+127.0.0.1
+5432
+lessondb
+cpp_user
+cpp
