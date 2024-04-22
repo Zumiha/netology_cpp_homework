@@ -1,5 +1,5 @@
 127.0.0.1
 5432
-lessondb
+hw0605
 cpp_user
 cpp

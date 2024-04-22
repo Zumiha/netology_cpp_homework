@@ -39,7 +39,7 @@ int main() {
 		std::cout << "\n" << e.what() << std::endl;
 	}
 
-	std::cout << "Programm completed." << std::endl;
+	std::cout << "Connection Session Completed." << std::endl;
 
 	return 0;
 }
