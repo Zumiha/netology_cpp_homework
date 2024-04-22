@@ -1,3 +1,6 @@
+*
+!.gitignore
+
 autom4te.cache
 build-*.out
 ChangeLog
