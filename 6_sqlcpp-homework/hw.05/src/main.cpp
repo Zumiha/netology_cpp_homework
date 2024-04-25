@@ -11,6 +11,7 @@ public:
 		std::string connection_info = dbconnect::FileInfo(_filename);
 		conn = std::make_unique<pqxx::connection>(connection_info);
 		std::cout << "Conneted to DB" << std::endl;
+		crtTables();
 	}
 	~DBeditor () {
 		if (conn->is_open()) {
@@ -18,25 +19,217 @@ public:
 			std::cout << "Disconnected" << std::endl;
 		}
 	}
+
+	void crtTables() {
+		std::cout << "Creating Tables...";
+		pqxx::work tx(*conn);
+		tx.exec(
+			"CREATE TABLE IF NOT EXISTS client("
+			"id SERIAL PRIMARY KEY NOT NULL, "
+			"first_name VARCHAR(60) NOT NULL, "
+			"last_name VARCHAR(60) NOT NULL, "
+			"email VARCHAR(255) UNIQUE NOT NULL)"
+		);
+		tx.exec(
+			"CREATE TABLE IF NOT EXISTS phones("
+			"id SERIAL PRIMARY KEY, "
+			"phone VARCHAR(60) UNIQUE, "
+			"client_id INT NOT NULL  REFERENCES client(id))"
+		);
+		tx.commit();
+		std::cout << "Tables created" << std::endl;
+	}
+
+	void addClient() {
+		pqxx::work tx(*conn);
+		std::string first_name, last_name, email, phone_num;
+		std::cout << "Enter client's first name: ";
+		std::cin >> first_name;   
+		std::cout << "Enter client's last name: ";
+		std::cin >> last_name;
+		std::cout << "Enter client's email: ";
+		std::cin >> email;
+
+		pqxx::result id_result = tx.exec_params ("INSERT INTO client (id, first_name, last_name, email) "
+			"VALUES (DEFAULT, $1, $2, $3) RETURNING id" , first_name, last_name, email);
+		pqxx::field const field = id_result[0][0]; 
+		/*контейнер pqxx::result это технически таблица (состоящая из рядов "pqxx::row" в которых поля "pqxx::field")
+		для итерации по этому объекту используют циклы, но тут возвращаем одно поле, поэтому и обращаемся напрямую. 
+		вообще конечно документация библиотеки в описательных смыслах страдает. */
+		tx.commit();
+		
+		//значение поля из pqxx::result полученного выше получаем через .c_str() и используем как id клиента
+		addPhone(field.c_str());
+		std::cout << std::endl;		
+	}
+
+	void addPhone(const std::string& _client_id) {
+        pqxx::work tx(*conn);
+		std::cout << "Enter client's phone number: ";
+		std::string phone_num;
+		std::cin >> phone_num;
+        tx.exec_params("INSERT INTO phones (client_id, phone) VALUES ($1, $2)", _client_id, phone_num);
+        tx.commit();
+    }
+
+	void delPhone(const std::string& _client_id) {
+        std::cout << "Delete all client's phones? (y/n): ";
+		std::string user_input;
+		std::cin >> user_input;
+		if (user_input != "n") {
+			pqxx::work tx(*conn);
+			tx.exec_params("DELETE FROM phones WHERE client_id = $1", _client_id);
+			tx.commit();	
+		} else {
+			std::cout << "Input phone to delete: ";
+			std::cin >> user_input;
+			try {
+				pqxx::work tx(*conn);
+				tx.exec_params("DELETE FROM phones WHERE phone = $1", user_input);
+				tx.commit();
+			}
+			catch(const std::exception& e) {
+				std::cerr << e.what() << '\n';
+			}			 
+		}
+		std::cout << std::endl;
+	}
+
+	void updtClient(const std::string& _client_id) {
+		try {
+			pqxx::work tx(*conn);
+			std::cout << "Enter client's new information (or enter 'skip' to keep old info)" << std::endl;
+			std::string user_input;
+			std::cout << "Enter client's new first name: ";
+			std::cin >> user_input;
+			if (user_input != "skip") {
+				tx.exec_params("UPDATE client "
+				"SET first_name = $1 WHERE id = $2",
+				user_input, _client_id);
+			}
+			std::cout << "Enter client's new last name: ";
+			std::cin >> user_input;
+			if (user_input != "skip") {
+				tx.exec_params("UPDATE client "
+				"SET last_name = $1 WHERE id = $2",
+				user_input, _client_id);
+			}
+			std::cout << "Enter client's new email: ";
+			std::cin >> user_input;
+			if (user_input != "skip") {
+				tx.exec_params("UPDATE client "
+				"SET email = $1 WHERE id = $2",
+				user_input, _client_id);
+			}
+			std::cout << "Enter client's new phone: ";
+			std::cin >> user_input;
+			if (user_input != "skip") {
+				tx.exec_params("DELETE FROM phones WHERE client_id = $1", _client_id);
+				tx.exec_params("INSERT INTO phones "
+				"(client_id, phone) VALUES ($2, $1)",
+				user_input, _client_id);
+			}		
+			tx.commit();
+		}
+		catch (const std::exception& e) {
+			std::cerr << e.what() << std::endl;
+		}
+		std::cout << std::endl;
+	}
+
+	void delClient (const std::string& _client_id) {
+		try {
+			pqxx::work tx(*conn);
+			tx.exec_params("DELETE FROM phones WHERE client_id = $1", _client_id);
+			tx.exec_params("DELETE FROM client WHERE id = $1", _client_id);
+			tx.commit();
+		} 
+		catch (const std::exception& e) {
+			std::cerr << e.what() << std::endl;
+		}
+	}
+
+	pqxx::result findClient() {
+		pqxx::result result;
+		try {
+			int input;
+			std::cout << "What data do you want to search for a client?" << std::endl;
+			std::cout << "1) first name" << std::endl;
+			std::cout << "2) last name" << std::endl;
+			std::cout << "3) email" << std::endl;
+			std::cout << "4) phone number" << std::endl;
+			std::cin >> input;
+			std::cout << std::endl;
+
+			if (input < 1 || input > 4) {
+				std::cout << "invalid input " << std::endl;
+				return result;
+			}
+
+			std::string info_input;
+			std::cout << "Enter information to search client: ";
+			std::cin >> info_input;
+					
+			pqxx::work tx(*conn);
+
+			if (input == 4) {
+				std::cout << "Searching phones...\n";
+				result = tx.exec_params("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
+				"FULL OUTER JOIN phones p ON client_id  = c.id "
+				"WHERE p.phone like $1 "
+				"GROUP BY c.id, p.phone "
+				"ORDER BY c.id ASC ", info_input);
+			} else {
+				std::cout << "Searching names...\n";
+				result = tx.exec_params("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
+				"FULL OUTER JOIN phones p ON client_id  = c.id "
+				"WHERE email like $1 OR first_name like $1 OR last_name like $1 "
+				"GROUP BY c.id, p.phone "
+				"ORDER BY c.id ASC ", info_input);
+			}
+			tx.commit();	
+		}
+		catch (const std::exception& e) {
+			std::cerr << e.what() << std::endl;
+		}
+		return result;
+	}
+
+	void foundClients(pqxx::result& _strng) {
+		std::cout << "Client search rusults\nid\tName\tSurname\tEmail\t\tPhone number" << std::endl;
+		for (auto row = _strng.begin(); row != _strng.end(); row++) {
+			for (auto field = row.begin(); field != row.end(); field++) {
+				std::cout << field->c_str()<< '\t';
+			}
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
+	}
+   
 private:
 	std::unique_ptr<pqxx::connection> conn;
 };
 
 int main() {
-
-	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);
-	
 	std::string filename = "info.txt";
 
 	try {
 		std::cout << "Connecting to DB...\n";
 		DBeditor db = DBeditor(filename); 
+		// db.addClient();
+		// db.addClient();
+		// db.addClient();
+		// db.addPhone("1");
+		// db.addPhone("1");
+		// db.delPhone("1");
+		// db.updtClient("1");
+		//db.delClient("1");
 
-		// pqxx::transaction tr{conn};
+		auto clients_info = db.findClient();
+		db.foundClients(clients_info);		
 
 	} catch (const std::exception& e) {
-		std::cout << "\n" << e.what() << std::endl;
+		std::cerr << "\n" << e.what() << std::endl;
 	}
 
 	std::cout << "Connection Session Completed." << std::endl;
