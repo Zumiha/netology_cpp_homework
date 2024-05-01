@@ -1,5 +1,0 @@
-cmake_minimum_required(VERSION 3.20.0)
-project(dbFileInfo VERSION 0.1)
-set(SOURCE_LIB dbFileInfo.cpp)
-set(SOURCE_HD dbFileInfo.h)
-add_library(dbFileInfo STATIC ${SOURCE_LIB} ${SOURCE_HD})

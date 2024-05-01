@@ -1,42 +1,25 @@
 #include <iostream>
-#include <exception>
-#include <pqxx/pqxx>
 #include <Windows.h>
 
-#include "dbFileInfo.h"
-
-class DBeditor {
-public:
-	DBeditor (std::string &_filename)	{
-		std::string connection_info = dbconnect::FileInfo(_filename);
-		conn = std::make_unique<pqxx::connection>(connection_info);
-		std::cout << "Conneted to DB" << std::endl;
-	}
-	~DBeditor () {
-		if (conn->is_open()) {
-			conn->close();
-			std::cout << "Disconnected" << std::endl;
-		}
-	}
-private:
-	std::unique_ptr<pqxx::connection> conn;
-};
+#include "dbx.h"
 
 int main() {
-
-	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);
-	
 	std::string filename = "info.txt";
 
 	try {
 		std::cout << "Connecting to DB...\n";
-		DBeditor db = DBeditor(filename); 
+		dbx::DBeditor db = dbx::DBeditor(filename); 
+		//db.addClient;
+		//db.addPhone("1");
+		//db.delPhone("1");
+		//db.updtClient("1");
+		//db.delClient("1");
 
-		// pqxx::transaction tr{conn};
+		auto clients_info = db.findClient();
+		db.foundClients(clients_info);		
 
 	} catch (const std::exception& e) {
-		std::cout << "\n" << e.what() << std::endl;
+		std::cerr << "\n" << e.what() << std::endl;
 	}
 
 	std::cout << "Connection Session Completed." << std::endl;
