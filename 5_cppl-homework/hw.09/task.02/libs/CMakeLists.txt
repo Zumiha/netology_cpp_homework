@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.20.0)
+project(BigInt VERSION 0.1)
+set(SOURCE_LIB BigInt.cpp)
+set(SOURCE_HD BigInt.h)
+add_library(BigInt STATIC ${SOURCE_LIB} ${SOURCE_HD})
