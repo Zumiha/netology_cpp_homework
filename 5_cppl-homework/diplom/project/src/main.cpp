@@ -31,7 +31,7 @@ int main() {
 		
 		std::cout << "var2 string: " << parser.getValue<int>("Section1.var4") << std::endl;
         std::cout << "var2 double: " << parser.getValue<double>("Section1.var4") << std::endl;
-        
+
         //parser.getValue<float>("Section1.var1"); //данная команда приводит к ошибке времени компиляции
 
     }
