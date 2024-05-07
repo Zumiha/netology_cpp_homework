@@ -25,11 +25,14 @@ int main() {
         // std::cout << "In Section1: var3 = " << value7 << '\n';
 
 
-        std::cout << "string: "<< parser.getValue<std::string>("Section1.var1") << std::endl;
-        std::cout << "int: " << parser.getValue<int>("Section1.var1") << std::endl;
-        std::cout << "double: " << parser.getValue<double>("Section1.var1") << std::endl;
-        //если раскоммнетируем, то увидим ошибку времени компиляции:
-        //parser.getValue<float>("Section1.var1");
+        std::cout << "var1 string: "<< parser.getValue<std::string>("Section1.var1") << std::endl;
+        std::cout << "var1 int: " << parser.getValue<int>("Section1.var1") << std::endl;
+        std::cout << "var1 double: " << parser.getValue<double>("Section1.var1") << std::endl << std::endl;
+		
+		std::cout << "var2 string: " << parser.getValue<int>("Section1.var4") << std::endl;
+        std::cout << "var2 double: " << parser.getValue<double>("Section1.var4") << std::endl;
+        
+        //parser.getValue<float>("Section1.var1"); //данная команда приводит к ошибке времени компиляции
 
     }
     catch (const std::exception& ex) {

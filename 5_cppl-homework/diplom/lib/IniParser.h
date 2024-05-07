@@ -21,22 +21,17 @@ public:
 
     template <typename T> T getValue (const std::string &request_string) {
         T result{};
-        //todo: получаем строку из имени переменной и секции в stringvalue
-        std::string stringvalue = getKeyValue(request_string);
-        //дальше может варьироваться в зависимости от фантазии typeid(int) == typeid(T)
+        std::string stringvalue = getKeyValue(request_string); //строку из имен секции и переменной в stringvalue
+
         if constexpr (std::is_same<int, T>::value) {
-        result = std::stoi(stringvalue);
+            result = std::stoi(stringvalue);
+        } else if constexpr (std::is_same<double, T>::value) {
+            result = std::stod(stringvalue);
+        } else if constexpr (std::is_same<std::string, T>::value) {
+            result = stringvalue;
+        } else {
+            static_assert(sizeof(T) == -1, "no implementation for this type!");
         }
-        else if constexpr (std::is_same<double, T>::value) {
-        result = std::stod(stringvalue);
-        }
-        else if constexpr (std::is_same<std::string, T>::value) {
-        result = stringvalue;
-        }
-        else {
-        staticassert(sizeof(T) == -1, "no implementation for this type!");
-        }
-        //возвращаем результат
         return result;        
     }
 
@@ -51,18 +46,15 @@ private:
     void parseFile(std::string &f_name);
 
     SectionData* getSecPtr(const std::string& section_name);
-
     const std::string getKeyValue(const std::string& _sec_name, const std::string& _var_name);
 
     void trimString(std::string &str);
-
     void removeComment(std::string& str);
 
     bool checkDelim (const std::string &_str, char _a);
     bool checkDelim (const std::string &_str, char _a, char _b);
 
     bool checkDubles (const std::string &_str, char _a);
-
     bool checkDubles (const std::string &_str, char _a, char _b);
 
     std::string getKeyValue(const std::string &request);

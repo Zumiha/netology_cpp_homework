@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20.0)
-project(IniParser VERSION 0.1)
+project(IniParser VERSION 1.0)
 set(SOURCE_LIB IniParser.cpp)
 set(SOURCE_HD IniParser.h)
 add_library(${PROJECT_NAME} SHARED ${SOURCE_LIB} ${SOURCE_HD})
