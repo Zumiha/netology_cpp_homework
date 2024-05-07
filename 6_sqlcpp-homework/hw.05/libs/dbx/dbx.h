@@ -10,17 +10,19 @@
 #include <exception>
 
 
-namespace dbconnect {
-    std::string FileInfo (std::string & _filename);
-}
-
 namespace dbx {
+    std::string infoGraber (std::string & _filename);
+    std::string infoGraber (std::string& _host, std::string& _port, 
+    std::string& _dbname, std::string& _user, std::string& _pass);
+
     class DBeditor {
     public:
         DBeditor (std::string &_filename);
+        DBeditor (std::string& _host, std::string& _port, 
+        std::string& _dbname, std::string& _user, std::string& _pass);
         ~DBeditor ();
 
-        void crtTables();
+        void initDBStructure();
         void addClient();
         void addPhone(const std::string& _client_id);
         void delPhone(const std::string& _client_id);

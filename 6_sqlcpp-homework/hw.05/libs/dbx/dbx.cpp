@@ -1,7 +1,7 @@
 #include "dbx.h"
 
-namespace dbconnect {
-    std::string FileInfo (std::string & _filename) {
+namespace dbx {
+    std::string infoGraber (std::string & _filename) {
         std::ifstream file (_filename);
 
         std::istream_iterator<std::string> start(file), end;
@@ -14,24 +14,35 @@ namespace dbconnect {
         std::string connection_info = ss.str();
         return connection_info;
     }
-}
 
-namespace dbx {
+    std::string infoGraber (std::string& _host, std::string& _port, std::string& _dbname, std::string& _user, std::string& _pass) {
+        std::stringstream ss;
+        ss << "host=" + _host + " port=" + _port + " dbname=" + _dbname + " user=" + _user + " password=" + _pass; 
+
+        std::string connection_info = ss.str();
+        return connection_info;
+    }
+
     DBeditor::DBeditor (std::string &_filename)	{
-        std::string connection_info = dbconnect::FileInfo(_filename);
-        conn = std::make_unique<pqxx::connection>(connection_info);
+        std::string connection_info = infoGraber(_filename);
+        this->conn = std::make_unique<pqxx::connection>(connection_info);
         std::cout << "Conneted to DB" << std::endl;
-        crtTables();
+    }
+
+        DBeditor::DBeditor (std::string& _host, std::string& _port, std::string& _dbname, std::string& _user, std::string& _pass)	{
+        std::string connection_info = infoGraber(_host, _port, _dbname, _user, _pass);
+        this->conn = std::make_unique<pqxx::connection>(connection_info);
+        std::cout << "Conneted to DB" << std::endl;
     }
 
     DBeditor::~DBeditor () {
-        if (conn->is_open()) {
-            conn->close();
+        if (this->conn->is_open()) {
+            this->conn->close();
             std::cout << "Disconnected" << std::endl;
         }
     }
 
-    void DBeditor::crtTables() {
+    void DBeditor::initDBStructure() {
         std::cout << "Creating Tables...";
         pqxx::work tx(*conn);
         tx.exec(
