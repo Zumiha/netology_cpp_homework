@@ -20,11 +20,24 @@ public:
     ~IniParser();
 
     template <typename T> T getValue (const std::string &request_string) {
-        std::string str = getKeyValue(request_string);
-        std::istringstream ss(str);
-        T num;
-        ss >> num;
-        return num;
+        T result{};
+        //todo: получаем строку из имени переменной и секции в stringvalue
+        std::string stringvalue = getKeyValue(request_string);
+        //дальше может варьироваться в зависимости от фантазии typeid(int) == typeid(T)
+        if constexpr (std::is_same<int, T>::value) {
+        result = std::stoi(stringvalue);
+        }
+        else if constexpr (std::is_same<double, T>::value) {
+        result = std::stod(stringvalue);
+        }
+        else if constexpr (std::is_same<std::string, T>::value) {
+        result = stringvalue;
+        }
+        else {
+        staticassert(sizeof(T) == -1, "no implementation for this type!");
+        }
+        //возвращаем результат
+        return result;        
     }
 
 private:
