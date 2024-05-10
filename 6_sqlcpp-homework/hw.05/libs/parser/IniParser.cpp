@@ -54,10 +54,6 @@ void IniParser::parseFile(std::string &f_name) {
                 } else {
                     it->var_val[_var]=_value;
                 }
-                
-                
-                
-
             } else { //если не нашли "="
                 throw std::invalid_argument("\tLine " + std::to_string(line_count) + ". Error in syntax.  Check '='\n");
             }
@@ -70,23 +66,6 @@ void IniParser::parseFile(std::string &f_name) {
 SectionData* IniParser::getSecPtr(const std::string& section_name) { //функция возвращения указателя на позицию имени_секции в массиве структур
     std::vector<SectionData>::iterator it = std::find_if (SectionsData.begin(), SectionsData.end(), [section_name](const SectionData& sect) {return sect.name.compare(section_name) == 0;} );
     return it != SectionsData.end() ? &*it : nullptr;
-}
-
-const std::string IniParser::getKeyValue(const std::string& _sec_name, const std::string& _var_name) {
-    SectionData* section = getSecPtr(_sec_name);
-    if (section != nullptr) {
-        const auto it = section->var_val.find(_var_name);
-        if (it != section->var_val.end()) {
-            if (it->second != "")
-                return it->second;
-            else
-                throw std::invalid_argument("Variable " + _var_name + " in " + _sec_name + " has no value");
-        }
-        else {
-            throw std::invalid_argument("Variable " + _var_name + " was not found in " + _sec_name);
-        }
-    }
-    throw std::invalid_argument("Such section does not exist");
 }
 
 void IniParser::trimString(std::string &str) {   
@@ -139,6 +118,23 @@ bool IniParser::checkDubles (const std::string &_str, char _a, char _b) { //пр
     }
 
     return false;
+}
+
+const std::string IniParser::getKeyValue(const std::string& _sec_name, const std::string& _var_name) {
+    SectionData* section = getSecPtr(_sec_name);
+    if (section != nullptr) {
+        const auto it = section->var_val.find(_var_name);
+        if (it != section->var_val.end()) {
+            if (it->second != "")
+                return it->second;
+            else
+                throw std::invalid_argument("Variable " + _var_name + " in " + _sec_name + " has no value");
+        }
+        else {
+            throw std::invalid_argument("Variable " + _var_name + " was not found in " + _sec_name);
+        }
+    }
+    throw std::invalid_argument("Such section does not exist");
 }
 
 std::string IniParser::getKeyValue(const std::string &request) {

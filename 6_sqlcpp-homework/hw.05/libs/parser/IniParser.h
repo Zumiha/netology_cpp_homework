@@ -35,6 +35,11 @@ public:
         return result;        
     }
 
+    std::string getValue (const std::string &_section, const std::string &_var) {
+        const std::string var_value = getKeyValue(_section, _var); //строку из имен секции и переменной в stringvalue
+        return var_value;        
+    }
+
 private:
     std::string request_line;
     std::string file_name;
@@ -46,7 +51,6 @@ private:
     void parseFile(std::string &f_name);
 
     SectionData* getSecPtr(const std::string& section_name);
-    const std::string getKeyValue(const std::string& _sec_name, const std::string& _var_name);
 
     void trimString(std::string &str);
     void removeComment(std::string& str);
@@ -57,5 +61,6 @@ private:
     bool checkDubles (const std::string &_str, char _a);
     bool checkDubles (const std::string &_str, char _a, char _b);
 
+    const std::string getKeyValue(const std::string& _sec_name, const std::string& _var_name);
     std::string getKeyValue(const std::string &request);
 };

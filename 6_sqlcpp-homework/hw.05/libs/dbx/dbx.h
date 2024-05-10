@@ -9,8 +9,10 @@
 #include <string>
 #include <exception>
 
+#include "IniParser.h"
 
-namespace dbx {
+
+namespace dbx {    
     std::string infoGraber (std::string & _filename);
     std::string infoGraber (std::string& _host, std::string& _port, 
     std::string& _dbname, std::string& _user, std::string& _pass);

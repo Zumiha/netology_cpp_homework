@@ -29,7 +29,7 @@ namespace dbx {
         std::cout << "Conneted to DB" << std::endl;
     }
 
-        DBeditor::DBeditor (std::string& _host, std::string& _port, std::string& _dbname, std::string& _user, std::string& _pass)	{
+    DBeditor::DBeditor (std::string& _host, std::string& _port, std::string& _dbname, std::string& _user, std::string& _pass)	{
         std::string connection_info = infoGraber(_host, _port, _dbname, _user, _pass);
         this->conn = std::make_unique<pqxx::connection>(connection_info);
         std::cout << "Conneted to DB" << std::endl;

@@ -2,29 +2,36 @@
 #include <Windows.h>
 
 #include "dbx.h"
-#include "IniParser.h"
 
 int main() {
 
 	try {
         IniParser parser("dbinfo.ini");
+		std::string section_name = "NetoDB";
+        // std::cout << "host = "<< parser.getValue<std::string>(section_name + ".host") << std::endl;
+        // std::cout << "port = " << parser.getValue<std::string>(section_name + ".port") << std::endl;
+        // std::cout << "dbname = " << parser.getValue<std::string>(section_name + ".dbname") << std::endl;
+		// std::cout << "user = " << parser.getValue<std::string>(section_name + ".user") << std::endl;
+        // std::cout << "password = " << parser.getValue<std::string>(section_name + ".password") << std::endl;
 
-        std::cout << "host = "<< parser.getValue<std::string>("NetoDB.host") << std::endl;
-        std::cout << "port = " << parser.getValue<std::string>("NetoDB.port") << std::endl;
-        std::cout << "dbname = " << parser.getValue<std::string>("NetoDB.dbname") << std::endl;
-		std::cout << "user = " << parser.getValue<std::string>("NetoDB.user") << std::endl;
-        std::cout << "password = " << parser.getValue<std::string>("NetoDB.password") << std::endl;
+		std::string host, port, dbname, user, pass;
+		
+		host = parser.getValue(section_name, "host");
+   		port = parser.getValue(section_name, "port"); 
+   		dbname = parser.getValue(section_name, "dbname");
+   		user = parser.getValue(section_name, "user"); 
+   		pass = parser.getValue(section_name, "password");	
 
-		//std::cout << "Connecting to DB...\n";
-		//dbx::DBeditor db = dbx::DBeditor(filename); 
-		//db.addClient;
-		//db.addPhone("1");
-		//db.delPhone("1");
-		//db.updtClient("1");
-		//db.delClient("1");
+		std::cout << "Connecting to DB...\n";
+		dbx::DBeditor db = dbx::DBeditor(host, port, dbname, user, pass); 
+		// db.addClient;
+		// db.addPhone("1");
+		// db.delPhone("1");
+		// db.updtClient("1");
+		// db.delClient("1");
 
-		//auto clients_info = db.findClient();
-		//db.foundClients(clients_info);		
+		auto clients_info = db.findClient();
+		db.foundClients(clients_info);		
 
 	} catch (const std::exception& e) {
 		std::cerr << "\n" << e.what() << std::endl;
