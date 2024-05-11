@@ -57,29 +57,32 @@ namespace dbx {
         std::cout << "Tables created" << std::endl;
     }
 
-    int DBeditor::addClient(const std::string& firstName, const std::string& lastName, const std::string& email) {
+    int DBeditor::addClient(const std::string& first_name, const std::string& last_name, const std::string& email) {
         pqxx::work tx(*conn);
-        std::string first_name, last_name, email, phone_num;
-        std::cout << "Enter client's first name: ";
-        std::cin >> first_name;   
-        std::cout << "Enter client's last name: ";
-        std::cin >> last_name;
-        std::cout << "Enter client's email: ";
-        std::cin >> email;
+        // std::string first_name, last_name, email, phone_num;
+        // std::cout << "Enter client's first name: ";
+        // std::cin >> first_name;   
+        // std::cout << "Enter client's last name: ";
+        // std::cin >> last_name;
+        // std::cout << "Enter client's email: ";
+        // std::cin >> email;
 
         pqxx::result id_result = tx.exec_params ("INSERT INTO client (id, first_name, last_name, email) "
             "VALUES (DEFAULT, $1, $2, $3) RETURNING id" , first_name, last_name, email);
         pqxx::field const field = id_result[0][0]; 
-        std::cout << typeid(field).name() << std::endl;
+        int val = std::stoi(field.c_str()); 
+        // field.as<int>(val); 
+        std::cout << "type: " << typeid(val).name() << ", value: " << val << std::endl;
+
         /* контейнер pqxx::result это технически таблица (состоящая из рядов "pqxx::row" в которых поля "pqxx::field")
         для итерации по этому объекту используют циклы, но тут возвращаем одно поле, поэтому и обращаемся напрямую. 
         вообще конечно документация библиотеки в описательных смыслах страдает. */
         tx.commit();
         
         //значение поля из pqxx::result полученного выше получаем через .c_str() и используем как id клиента
-        addPhone(field.c_str());
+        // addPhone(field.c_str());
         std::cout << std::endl;
-        return 1;	//изменить!
+        return val;	//изменить!
     }
 
     void DBeditor::addPhone(const std::string& _client_id) {

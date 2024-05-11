@@ -30,7 +30,7 @@ namespace dbx {
         std::string& _dbname, std::string& _user, std::string& _pass);
         ~DBeditor ();
 
-        int addClient(const std::string& firstName, const std::string& lastName, const std::string& email);
+        int addClient(const std::string& first_name, const std::string& last_name, const std::string& email);
         // void addPhoneNumber(int clientId, const std::string& phoneNumber);
         // void updateClient(int clientId, const std::string& firstName, const std::string& lastName, const std::string& email);
         // void removeClient(int clientId);

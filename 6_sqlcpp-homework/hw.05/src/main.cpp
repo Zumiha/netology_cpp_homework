@@ -24,14 +24,15 @@ int main() {
 
 		std::cout << "Connecting to DB...\n";
 		dbx::DBeditor db = dbx::DBeditor(host, port, dbname, user, pass); 
-		// db.addClient;
+		auto a = db.addClient("testJoe6", "testSmith6", "test@6");
+		std::cout << typeid(a).name() << " " << a << std::endl;
 		// db.addPhone("1");
 		// db.delPhone("1");
 		// db.updtClient("1");
 		// db.delClient("1");
 
-		auto clients_info = db.findClient();
-		db.foundClients(clients_info);		
+		// auto clients_info = db.findClient();
+		// db.foundClients(clients_info);		
 
 	} catch (const std::exception& e) {
 		std::cerr << "\n" << e.what() << std::endl;
