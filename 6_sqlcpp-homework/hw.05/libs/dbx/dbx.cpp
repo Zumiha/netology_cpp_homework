@@ -15,14 +15,6 @@ namespace dbx {
         return connection_info;
     }
 
-    std::string infoGraber (std::string& _host, std::string& _port, std::string& _dbname, std::string& _user, std::string& _pass) {
-        std::stringstream ss;
-        ss << "host=" + _host + " port=" + _port + " dbname=" + _dbname + " user=" + _user + " password=" + _pass; 
-
-        std::string connection_info = ss.str();
-        return connection_info;
-    }
-
     DBeditor::DBeditor (std::string &_filename)	{
         std::string connection_info = infoGraber(_filename);
         this->conn = std::make_unique<pqxx::connection>(connection_info);
@@ -30,7 +22,10 @@ namespace dbx {
     }
 
     DBeditor::DBeditor (std::string& _host, std::string& _port, std::string& _dbname, std::string& _user, std::string& _pass)	{
-        std::string connection_info = infoGraber(_host, _port, _dbname, _user, _pass);
+        std::stringstream ss;
+        ss << "host=" + _host + " port=" + _port + " dbname=" + _dbname + " user=" + _user + " password=" + _pass; 
+        std::string connection_info = ss.str();
+
         this->conn = std::make_unique<pqxx::connection>(connection_info);
         std::cout << "Conneted to DB" << std::endl;
     }
@@ -62,7 +57,7 @@ namespace dbx {
         std::cout << "Tables created" << std::endl;
     }
 
-    void DBeditor::addClient() {
+    int DBeditor::addClient(const std::string& firstName, const std::string& lastName, const std::string& email) {
         pqxx::work tx(*conn);
         std::string first_name, last_name, email, phone_num;
         std::cout << "Enter client's first name: ";
@@ -75,14 +70,16 @@ namespace dbx {
         pqxx::result id_result = tx.exec_params ("INSERT INTO client (id, first_name, last_name, email) "
             "VALUES (DEFAULT, $1, $2, $3) RETURNING id" , first_name, last_name, email);
         pqxx::field const field = id_result[0][0]; 
-        /*контейнер pqxx::result это технически таблица (состоящая из рядов "pqxx::row" в которых поля "pqxx::field")
+        std::cout << typeid(field).name() << std::endl;
+        /* контейнер pqxx::result это технически таблица (состоящая из рядов "pqxx::row" в которых поля "pqxx::field")
         для итерации по этому объекту используют циклы, но тут возвращаем одно поле, поэтому и обращаемся напрямую. 
         вообще конечно документация библиотеки в описательных смыслах страдает. */
         tx.commit();
         
         //значение поля из pqxx::result полученного выше получаем через .c_str() и используем как id клиента
         addPhone(field.c_str());
-        std::cout << std::endl;		
+        std::cout << std::endl;
+        return 1;	//изменить!
     }
 
     void DBeditor::addPhone(const std::string& _client_id) {

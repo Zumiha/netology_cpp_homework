@@ -14,8 +14,14 @@
 
 namespace dbx {    
     std::string infoGraber (std::string & _filename);
-    std::string infoGraber (std::string& _host, std::string& _port, 
-    std::string& _dbname, std::string& _user, std::string& _pass);
+
+    struct client_info {
+        int id;
+        std::string first_name;
+        std::string last_name;
+        std::string email;
+        std::vector<std::string> phones;
+    };
 
     class DBeditor {
     public:
@@ -24,8 +30,14 @@ namespace dbx {
         std::string& _dbname, std::string& _user, std::string& _pass);
         ~DBeditor ();
 
+        int addClient(const std::string& firstName, const std::string& lastName, const std::string& email);
+        // void addPhoneNumber(int clientId, const std::string& phoneNumber);
+        // void updateClient(int clientId, const std::string& firstName, const std::string& lastName, const std::string& email);
+        // void removeClient(int clientId);
+        // void findClient(const std::string& searchValue);
+
         void initDBStructure();
-        void addClient();
+
         void addPhone(const std::string& _client_id);
         void delPhone(const std::string& _client_id);
         void updtClient(const std::string& _client_id);
