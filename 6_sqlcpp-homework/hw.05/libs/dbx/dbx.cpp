@@ -3,7 +3,6 @@
 namespace dbx {
     std::string infoGraber (std::string & _filename) {
         std::ifstream file (_filename);
-
         std::istream_iterator<std::string> start(file), end;
         std::vector<std::string> info_vect(start, end);
         file.close();
@@ -59,107 +58,64 @@ namespace dbx {
 
     int DBeditor::addClient(const std::string& first_name, const std::string& last_name, const std::string& email) {
         pqxx::work tx(*conn);
-        // std::string first_name, last_name, email, phone_num;
-        // std::cout << "Enter client's first name: ";
-        // std::cin >> first_name;   
-        // std::cout << "Enter client's last name: ";
-        // std::cin >> last_name;
-        // std::cout << "Enter client's email: ";
-        // std::cin >> email;
 
         pqxx::result id_result = tx.exec_params ("INSERT INTO client (id, first_name, last_name, email) "
             "VALUES (DEFAULT, $1, $2, $3) RETURNING id" , first_name, last_name, email);
         pqxx::field const field = id_result[0][0]; 
         int val = std::stoi(field.c_str()); 
-        // field.as<int>(val); 
-        std::cout << "type: " << typeid(val).name() << ", value: " << val << std::endl;
-
         /* контейнер pqxx::result это технически таблица (состоящая из рядов "pqxx::row" в которых поля "pqxx::field")
         для итерации по этому объекту используют циклы, но тут возвращаем одно поле, поэтому и обращаемся напрямую. 
         вообще конечно документация библиотеки в описательных смыслах страдает. */
-        tx.commit();
-        
+        tx.commit();        
         //значение поля из pqxx::result полученного выше получаем через .c_str() и используем как id клиента
-        // addPhone(field.c_str());
-        std::cout << std::endl;
-        return val;	//изменить!
+        return val;
     }
 
-    void DBeditor::addPhone(const std::string& _client_id) {
+    void DBeditor::addPhoneNumber(const int& _client_id, const std::string& phone_num) {
         pqxx::work tx(*conn);
-        std::cout << "Enter client's phone number: ";
-        std::string phone_num;
-        std::cin >> phone_num;
         tx.exec_params("INSERT INTO phones (client_id, phone) VALUES ($1, $2)", _client_id, phone_num);
         tx.commit();
     }
 
-    void DBeditor::delPhone(const std::string& _client_id) {
-        std::cout << "Delete all client's phones? (y/n): ";
-        std::string user_input;
-        std::cin >> user_input;
-        if (user_input != "n") {
-            pqxx::work tx(*conn);
-            tx.exec_params("DELETE FROM phones WHERE client_id = $1", _client_id);
-            tx.commit();	
-        } else {
-            std::cout << "Input phone to delete: ";
-            std::cin >> user_input;
-            try {
-                pqxx::work tx(*conn);
-                tx.exec_params("DELETE FROM phones WHERE phone = $1", user_input);
-                tx.commit();
-            }
-            catch(const std::exception& e) {
-                std::cerr << e.what() << '\n';
-            }			 
-        }
-        std::cout << std::endl;
-    }
-
-    void DBeditor::updtClient(const std::string& _client_id) {
+    void DBeditor::updateClient(const int& _client_id, const std::string& first_name, const std::string& last_name, const std::string& email) {
         try {
             pqxx::work tx(*conn);
-            std::cout << "Enter client's new information (or enter 'skip' to keep old info)" << std::endl;
-            std::string user_input;
-            std::cout << "Enter client's new first name: ";
-            std::cin >> user_input;
-            if (user_input != "skip") {
+            if (first_name != "skip") {
                 tx.exec_params("UPDATE client "
                 "SET first_name = $1 WHERE id = $2",
-                user_input, _client_id);
+                first_name, _client_id);
             }
-            std::cout << "Enter client's new last name: ";
-            std::cin >> user_input;
-            if (user_input != "skip") {
+
+            if (last_name != "skip") {
                 tx.exec_params("UPDATE client "
                 "SET last_name = $1 WHERE id = $2",
-                user_input, _client_id);
+                last_name, _client_id);
             }
-            std::cout << "Enter client's new email: ";
-            std::cin >> user_input;
-            if (user_input != "skip") {
+
+            if (email != "skip") {
                 tx.exec_params("UPDATE client "
                 "SET email = $1 WHERE id = $2",
-                user_input, _client_id);
+                email, _client_id);
             }
-            std::cout << "Enter client's new phone: ";
-            std::cin >> user_input;
-            if (user_input != "skip") {
-                tx.exec_params("DELETE FROM phones WHERE client_id = $1", _client_id);
-                tx.exec_params("INSERT INTO phones "
-                "(client_id, phone) VALUES ($2, $1)",
-                user_input, _client_id);
-            }		
             tx.commit();
         }
         catch (const std::exception& e) {
             std::cerr << e.what() << std::endl;
         }
-        std::cout << std::endl;
     }
 
-    void DBeditor::delClient (const std::string& _client_id) {
+    void DBeditor::delPhone(const int& _client_id) {
+        pqxx::work tx(*conn);
+        tx.exec_params("DELETE FROM phones WHERE client_id = $1", _client_id);
+        tx.commit();
+    }
+    void DBeditor::delPhone(const int& _client_id, const std::string& phone_num) {
+        pqxx::work tx(*conn);
+        tx.exec_params("DELETE FROM phones WHERE client_id = $1 AND phone = $2", _client_id, phone_num);
+        tx.commit();
+    }    
+
+    void DBeditor::delClient (const int& _client_id) {
         try {
             pqxx::work tx(*conn);
             tx.exec_params("DELETE FROM phones WHERE client_id = $1", _client_id);
@@ -171,72 +127,46 @@ namespace dbx {
         }
     }
 
-    pqxx::result DBeditor::findClient() {
+    pqxx::result DBeditor::findClient(const std::string& searchValue, const int &param) {
         pqxx::result result;
-        try {
-            int input;
-            std::cout << "What data do you want to search for a client?" << std::endl;
-            std::cout << "1) first name" << std::endl;
-            std::cout << "2) last name" << std::endl;
-            std::cout << "3) email" << std::endl;
-            std::cout << "4) phone number" << std::endl;
-            std::cout << "\nInput: ";
-            std::cin >> input;
-            std::cout << std::endl;
-
-            if (input < 1 || input > 4) {
-                std::cout << "invalid input " << std::endl;
-                return result;
-            }
-
-            std::string info_input;
-            std::cout << "Enter information to search client: ";
-            std::cin >> info_input;
-                    
-            pqxx::work tx(*conn);
-
-            if (input == 4) {
-                std::cout << "Searching phones...\n";
-
-                result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
+        pqxx::work tx(*conn);
+        
+        switch (param)
+        {
+        case 1: //first name
+            result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
                 "FULL OUTER JOIN phones p ON client_id  = c.id "
-                "WHERE p.phone LIKE '%" + info_input + "%' "
+                "WHERE first_name LIKE '%" + searchValue + "%' "
                 "GROUP BY c.id, p.phone "
                 "ORDER BY c.id ASC ");
-
-            } else if (input == 1) {
-                std::cout << "Searching names...\n";
-                
-                result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
+            break;
+        case 2: //last name
+            result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
                 "FULL OUTER JOIN phones p ON client_id  = c.id "
-                "WHERE first_name LIKE '%" + info_input + "%' "
+                "WHERE last_name LIKE '%" + searchValue + "%' "
                 "GROUP BY c.id, p.phone "
                 "ORDER BY c.id ASC ");
-
-            }  else if (input == 2) {
-                std::cout << "Searching names...\n";
-                
-                result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
+            break;
+        case 3: //email
+            result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
                 "FULL OUTER JOIN phones p ON client_id  = c.id "
-                "WHERE last_name LIKE '%" + info_input + "%' "
+                "WHERE email LIKE '%" + searchValue + "%' "
                 "GROUP BY c.id, p.phone "
                 "ORDER BY c.id ASC ");
-                
-            }  else if (input == 3) {
-                std::cout << "Searching email...\n";
-                
-                result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
+            break;
+        case 4: //phone number
+            result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
                 "FULL OUTER JOIN phones p ON client_id  = c.id "
-                "WHERE email LIKE '%" + info_input + "%' "
+                "WHERE p.phone LIKE '%" + searchValue + "%' "
                 "GROUP BY c.id, p.phone "
                 "ORDER BY c.id ASC ");
-                
-            }
-            tx.commit();	
+            break;
+        default:
+            throw std::invalid_argument("Error. Invalid <client_data> parameter.\n");
+            break;
         }
-        catch (const std::exception& e) {
-            std::cerr << e.what() << std::endl;
-        }
+        std::cout << "Searching " + param = 1 ? "first names…" : param = 2 ? "last names…" : param = 3 ? "email…" : param = 4 ? "phone…" : "unknown..." << std::endl;
+        tx.commit();	
         return result;
     }
 

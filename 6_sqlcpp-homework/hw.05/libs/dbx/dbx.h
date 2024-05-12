@@ -15,7 +15,7 @@
 namespace dbx {    
     std::string infoGraber (std::string & _filename);
 
-    struct client_info {
+    struct ClientInfo {
         int id;
         std::string first_name;
         std::string last_name;
@@ -30,20 +30,17 @@ namespace dbx {
         std::string& _dbname, std::string& _user, std::string& _pass);
         ~DBeditor ();
 
-        int addClient(const std::string& first_name, const std::string& last_name, const std::string& email);
-        // void addPhoneNumber(int clientId, const std::string& phoneNumber);
-        // void updateClient(int clientId, const std::string& firstName, const std::string& lastName, const std::string& email);
-        // void removeClient(int clientId);
-        // void findClient(const std::string& searchValue);
-
         void initDBStructure();
 
-        void addPhone(const std::string& _client_id);
-        void delPhone(const std::string& _client_id);
-        void updtClient(const std::string& _client_id);
-        void delClient (const std::string& _client_id);
-        pqxx::result findClient();
-        void foundClients(pqxx::result& _strng);    
+        int addClient(const std::string& first_name, const std::string& last_name, const std::string& email);
+        void addPhoneNumber(const int& _client_id, const std::string& phone_num);
+        void updateClient(const int& _client_id, const std::string& first_name, const std::string& last_name, const std::string& email);
+        void delPhone(const int& _client_id);
+        void delPhone(const int& _client_id, const std::string& phone_num);               
+        void delClient (const int& _client_id);  
+
+        pqxx::result findClient(const std::string& searchValue, const int &param);
+        void foundClients(pqxx::result& _strng);
     private:
         std::unique_ptr<pqxx::connection> conn;
     };
