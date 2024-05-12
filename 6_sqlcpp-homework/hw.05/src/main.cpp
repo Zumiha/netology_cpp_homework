@@ -24,7 +24,7 @@ int main() {
 
 		std::cout << "Connecting to DB...\n";
 		dbx::DBeditor db = dbx::DBeditor(host, port, dbname, user, pass); 
-		dbx::ClientInfo cInfo; 
+		dbx::ClientInfo test_client_1{"test73", "tost73", "test@tost73", {"78999455"}}; 
 		// auto a = db.addClient("testJoe6", "testSmith6", "test@6");
 		// std::cout << typeid(a).name() << " " << a << std::endl;
 		// db.addPhone("1");

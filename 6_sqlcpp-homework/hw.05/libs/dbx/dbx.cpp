@@ -71,10 +71,32 @@ namespace dbx {
         return val;
     }
 
+    int DBeditor::addClient(const ClientInfo& _client_data) { // можно заносить данные из структуры
+        pqxx::work tx(*conn);
+        pqxx::result id_result = tx.exec_params ("INSERT INTO client (id, first_name, last_name, email) "
+            "VALUES (DEFAULT, $1, $2, $3) RETURNING id" , _client_data.first_name, _client_data.last_name, _client_data.email);
+        pqxx::field const field = id_result[0][0]; 
+        int val = std::stoi(field.c_str()); 
+        tx.commit();
+        _client_data.id = val;        
+        return val;
+    }
+
     void DBeditor::addPhoneNumber(const int& _client_id, const std::string& phone_num) {
         pqxx::work tx(*conn);
         tx.exec_params("INSERT INTO phones (client_id, phone) VALUES ($1, $2)", _client_id, phone_num);
         tx.commit();
+    }
+
+    void DBeditor::addPhoneNumber(const ClientInfo& _client_data) {
+        if (_client_data.id == -1) { // если id будет равно -1, значит DBeditor еще в БД не добавлял данные и не вернул id из БД. нельзя добавлять телефон для еще не существующего клиента. 
+            throw std::invalid_argument("Error. Cannot add information on non-existing entry.\n");
+        }
+        pqxx::work tx(*conn);
+        for(auto& i : _client_data.phones) {
+            tx.exec_params("INSERT INTO phones (client_id, phone) VALUES ($1, $2)", _client_data.id, i);
+        }
+        tx.commit();        
     }
 
     void DBeditor::updateClient(const int& _client_id, const std::string& first_name, const std::string& last_name, const std::string& email) {

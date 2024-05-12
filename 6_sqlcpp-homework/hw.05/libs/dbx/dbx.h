@@ -16,11 +16,12 @@ namespace dbx {
     std::string infoGraber (std::string & _filename);
 
     struct ClientInfo {
-        int id;
+        ClientInfo (std::string _fname, std::string _lname, std::string _email, std::vector<std::string> _phones): first_name(_fname), last_name(_lname) , email(_email) , phones(_phones) {}
         std::string first_name;
         std::string last_name;
         std::string email;
         std::vector<std::string> phones;
+        int id = -1;
     };
 
     class DBeditor {
@@ -33,7 +34,9 @@ namespace dbx {
         void initDBStructure();
 
         int addClient(const std::string& first_name, const std::string& last_name, const std::string& email);
+        int addClient(const ClientInfo& _client_data);
         void addPhoneNumber(const int& _client_id, const std::string& phone_num);
+        void addPhoneNumber(const ClientInfo& _client_data);
         void updateClient(const int& _client_id, const std::string& first_name, const std::string& last_name, const std::string& email);
         void delPhone(const int& _client_id);
         void delPhone(const int& _client_id, const std::string& phone_num);               
