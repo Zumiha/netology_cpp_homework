@@ -24,16 +24,23 @@ int main() {
 
 		std::cout << "Connecting to DB...\n";
 		dbx::DBeditor db = dbx::DBeditor(host, port, dbname, user, pass); 
-		dbx::ClientInfo test_client_1{"test73", "tost73", "test@tost73", {"78999455"}}; 
-		// auto a = db.addClient("testJoe6", "testSmith6", "test@6");
-		// std::cout << typeid(a).name() << " " << a << std::endl;
-		// db.addPhone("1");
-		// db.delPhone("1");
-		// db.updtClient("1");
-		// db.delClient("1");
+		dbx::ClientInfo test_client_1{"test75", "tost75", "test@tost75", {"78911995","888522569","88117756"}}; 
+		
+		auto a = db.addClient("testJoe9", "testSmith9", "test@9");
+		db.addPhoneNumber(a, "766654224424");
 
-		// auto clients_info = db.findClient();
-		// db.foundClients(clients_info);		
+		db.addClient(test_client_1);
+		db.addPhoneNumber(test_client_1);
+				
+		db.addPhoneNumber(8, "655477755");
+		db.delPhone(8, "655477755");
+
+
+		db.updateClient(8, "test@8updated", EMAIL);
+		// db.delClient(2);
+
+		auto clients_info = db.findClient("Joe", FNAME);
+		db.foundClients(clients_info);		
 
 	} catch (const std::exception& e) {
 		std::cerr << "\n" << e.what() << std::endl;

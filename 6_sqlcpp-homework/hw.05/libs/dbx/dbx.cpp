@@ -71,7 +71,7 @@ namespace dbx {
         return val;
     }
 
-    int DBeditor::addClient(const ClientInfo& _client_data) { // можно заносить данные из структуры
+    int DBeditor::addClient(ClientInfo& _client_data) { // можно заносить данные из структуры
         pqxx::work tx(*conn);
         pqxx::result id_result = tx.exec_params ("INSERT INTO client (id, first_name, last_name, email) "
             "VALUES (DEFAULT, $1, $2, $3) RETURNING id" , _client_data.first_name, _client_data.last_name, _client_data.email);
@@ -99,31 +99,27 @@ namespace dbx {
         tx.commit();        
     }
 
-    void DBeditor::updateClient(const int& _client_id, const std::string& first_name, const std::string& last_name, const std::string& email) {
-        try {
-            pqxx::work tx(*conn);
-            if (first_name != "skip") {
-                tx.exec_params("UPDATE client "
-                "SET first_name = $1 WHERE id = $2",
-                first_name, _client_id);
-            }
-
-            if (last_name != "skip") {
-                tx.exec_params("UPDATE client "
-                "SET last_name = $1 WHERE id = $2",
-                last_name, _client_id);
-            }
-
-            if (email != "skip") {
-                tx.exec_params("UPDATE client "
-                "SET email = $1 WHERE id = $2",
-                email, _client_id);
-            }
-            tx.commit();
+    void DBeditor::updateClient(const int &_client_id, const std::string& _update_value, cdParam param) {
+        pqxx::work tx(*conn);
+        switch (param)
+        {
+        case FNAME: //first name
+            tx.exec_params("UPDATE client "
+                "SET first_name = $1 WHERE id = $2", _update_value, _client_id);
+            break;
+        case LNAME: //last name
+            tx.exec_params("UPDATE client "
+                "SET last_name = $1 WHERE id = $2", _update_value, _client_id);
+            break;
+        case EMAIL: //email
+            tx.exec_params("UPDATE client "
+                "SET email = $1 WHERE id = $2", _update_value, _client_id);
+            break;
+        default:
+            throw std::invalid_argument("Error. Invalid <client_data> parameter.\n");
+            break;
         }
-        catch (const std::exception& e) {
-            std::cerr << e.what() << std::endl;
-        }
+        tx.commit();
     }
 
     void DBeditor::delPhone(const int& _client_id) {
@@ -149,37 +145,37 @@ namespace dbx {
         }
     }
 
-    pqxx::result DBeditor::findClient(const std::string& searchValue, const int &param) {
+    pqxx::result DBeditor::findClient(const std::string& searchValue, cdParam param) {
         pqxx::result result;
         pqxx::work tx(*conn);
         
         switch (param)
         {
-        case 1: //first name
+        case FNAME: //first name
             result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
                 "FULL OUTER JOIN phones p ON client_id  = c.id "
-                "WHERE first_name LIKE '%" + searchValue + "%' "
+                "WHERE first_name LIKE '%" +  tx.esc(searchValue) + "%' "
                 "GROUP BY c.id, p.phone "
                 "ORDER BY c.id ASC ");
             break;
-        case 2: //last name
+        case LNAME: //last name
             result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
                 "FULL OUTER JOIN phones p ON client_id  = c.id "
-                "WHERE last_name LIKE '%" + searchValue + "%' "
+                "WHERE last_name LIKE '%" + tx.esc(searchValue) + "%' "
                 "GROUP BY c.id, p.phone "
                 "ORDER BY c.id ASC ");
             break;
-        case 3: //email
+        case EMAIL: //email
             result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
                 "FULL OUTER JOIN phones p ON client_id  = c.id "
-                "WHERE email LIKE '%" + searchValue + "%' "
+                "WHERE email LIKE '%" + tx.esc(searchValue) + "%' "
                 "GROUP BY c.id, p.phone "
                 "ORDER BY c.id ASC ");
             break;
-        case 4: //phone number
+        case PHONE: //phone number
             result = tx.exec("SELECT c.id, first_name, last_name, email, p.phone  FROM client c "
                 "FULL OUTER JOIN phones p ON client_id  = c.id "
-                "WHERE p.phone LIKE '%" + searchValue + "%' "
+                "WHERE p.phone LIKE '%" + tx.esc(searchValue) + "%' "
                 "GROUP BY c.id, p.phone "
                 "ORDER BY c.id ASC ");
             break;
@@ -187,7 +183,7 @@ namespace dbx {
             throw std::invalid_argument("Error. Invalid <client_data> parameter.\n");
             break;
         }
-        std::cout << "Searching " + param = 1 ? "first names…" : param = 2 ? "last names…" : param = 3 ? "email…" : param = 4 ? "phone…" : "unknown..." << std::endl;
+      //  std::cout << "Searching " + (param = 1 ? "first names…" : param = 2 ? "last names…" : param = 3 ? "email…" : param = 4 ? "phone…" : "unknown..." ) << std::endl;
         tx.commit();	
         return result;
     }
