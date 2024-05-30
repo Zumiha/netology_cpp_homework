@@ -30,6 +30,9 @@ void swapLock(Data& _a, Data& _b) {
 
 void swapScopedLock (Data& _a, Data& _b) {
     std::scoped_lock scpd_lock (_a.mutex, _b.mutex);
+    // std::unique_lock unq_lock1 (_a.mutex, std::defer_lock);
+    // std::unique_lock unq_lock2 (_b.mutex, std::defer_lock);
+    // std::scoped_lock scpd_lock (unq_lock1, unq_lock2);
     int temp = _a.getVal();
     _a.setVal(_b.getVal());
     _b.setVal(temp);
