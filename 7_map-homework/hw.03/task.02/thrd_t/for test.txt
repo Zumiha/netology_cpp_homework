@@ -1,0 +1,7 @@
+int _counter = 8; std::cout << "\n\nCounter: " << _counter << std::endl;
+unsigned int size = std::distance(v.begin(), v.end()); std::cout << "Size: " << size << std::endl;
+unsigned int hardw_threads = std::thread::hardware_concurrency(); std::cout << "Threads: " << hardw_threads << std::endl;
+auto block_per_thread = std::ceil(size*1.0 / hardw_threads); std::cout << "Block per thread: " << block_per_thread << std::endl;
+int counter_int = (_counter/2 + 1); std::cout << "Counter int: " << counter_int; 
+bool counter_remainder_zero; if ((_counter/2 + 1)%2 == 0) {counter_remainder_zero = true;} else {counter_remainder_zero = false;}
+std::cout << " Counter remainder zero: " << counter_remainder_zero << std::endl;
