@@ -30,6 +30,8 @@ public:
 	~Shape();
 	double virtual calcLength(pointCoord point_one, pointCoord point_two) const;
 	bool virtual checkEquality(pointCoord _a, pointCoord _b) const;
+	double virtual calcArea() const;
+	double virtual calcVolume() const;
 	int getType() {
 		return type; 
 	}
@@ -52,6 +54,7 @@ public:
 	Square(pointCoord _a, pointCoord _b) : Shape (SQUARE), dot_A(_a), dot_B(_b) {};
 	~Square () {};
 	bool virtual checkEquality(pointCoord _a, pointCoord _b) const override;
+	double calcArea() const override;
 private:
 	pointCoord dot_A;
 	pointCoord dot_B;
@@ -86,3 +89,4 @@ private:
 	double radius;
 	pointCoord dot_H;
 };
+
