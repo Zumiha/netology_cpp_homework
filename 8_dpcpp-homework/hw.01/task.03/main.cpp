@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cassert>
-#include "sql_query_builder.h"
+#include "adv_sql_query_builder.h"
 
 int main () {
     AdvQueryBuilder query_builder3;
