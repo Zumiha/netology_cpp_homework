@@ -14,9 +14,6 @@ MainWindow::MainWindow(QWidget *parent):QMainWindow(parent), ui(new Ui::MainWind
 
     stopwatch = new StopWatch(this);
     connect(stopwatch, &StopWatch::emit_updateTime, this, &MainWindow::recive_updateTime);
-
-    connect(this, &MainWindow::lapTime, stopwatch, &StopWatch::lapTime);
-    connect(this, &MainWindow::timeCleared, stopwatch, &StopWatch::timeCleared);
 }
 
 MainWindow::~MainWindow() {
@@ -43,7 +40,7 @@ void MainWindow::LaunchButtonClicked() {
     }
 }
 void MainWindow::LapButtonClicked() {
-    emit lapTime();
+    stopwatch->lapTime();
     auto cursor = QTextCursor(ui->lap_record->document()); cursor.setPosition(0); ui->lap_record->setTextCursor(cursor);
     ui->lap_record->insertPlainText(stopwatch->getLapInfo());
 }
@@ -51,5 +48,5 @@ void MainWindow::LapButtonClicked() {
 void MainWindow::ClearButtonClicked() {
     ui->time_label->setText("00:00.0");
     ui->lap_record->clear();
-    emit timeCleared();
+    stopwatch->timeCleared();
 }
