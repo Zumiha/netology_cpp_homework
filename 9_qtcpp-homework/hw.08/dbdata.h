@@ -15,8 +15,7 @@ public:
     explicit DbData(QWidget *parent = nullptr);
     ~DbData();
 
-
- signals:
+signals:
     void sig_sendData(QVector<QString> dbData);
 
 

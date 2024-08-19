@@ -10,55 +10,33 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lb_statusConnect->setStyleSheet("color:red");
     ui->pb_request->setEnabled(false);
 
-    /*
-     * Выделим память под необходимые объекты. Все они наследники
-     * QObject, поэтому воспользуемся иерархией.
-    */
+    //Выделим память под необходимые объекты. Все они наследники QObject, поэтому воспользуемся иерархией.
 
     dataDb = new DbData(this);
     dataBase = new DataBase(this);
     msg = new QMessageBox(this);
 
-    //Установим размер вектора данных для подключения к БД
-    dataForConnect.resize(NUM_DATA_FOR_CONNECT_TO_DB);
+    dataForConnect.resize(NUM_DATA_FOR_CONNECT_TO_DB); //Установим размер вектора данных для подключения к БД
+    dataBase->AddDataBase(POSTGRE_DRIVER, DB_NAME); //Добавим БД используя стандартный драйвер PSQL и зададим имя.
 
-    /*
-     * Добавим БД используя стандартный драйвер PSQL и зададим имя.
-    */
-    dataBase->AddDataBase(POSTGRE_DRIVER, DB_NAME);
-
-    /*
-     * Устанавливаем данные для подключениея к БД.
-     * Поскольку метод небольшой используем лямбда-функцию.
-     */
-    connect(dataDb, &DbData::sig_sendData, this, [&](QVector<QString> receivData){
-        dataForConnect = receivData;
-    });
-
-    /*
-     * Соединяем сигнал, который передает ответ от БД с методом, который отображает ответ в ПИ
-     */
-     connect(dataBase, &DataBase::sig_SendDataFromDB, this, &MainWindow::ScreenDataFromDB);
-
-    /*
-     *  Сигнал для подключения к БД
-     */
-    connect(dataBase, &DataBase::sig_SendStatusConnection, this, &MainWindow::ReceiveStatusConnectionToDB);
+    connect(dataDb, &DbData::sig_sendData, this, [&](QVector<QString> receivData){dataForConnect = receivData;}); //Устанавливаем данные для подключениея к БД. Поскольку метод небольшой используем лямбда-функцию.
+    connect(dataBase, &DataBase::sig_SendDataFromDB, this, &MainWindow::ScreenDataFromDB); //Соединяем сигнал, который передает ответ от БД с методом, который отображает ответ в ПИ
+    connect(dataBase, &DataBase::sig_SendStatusConnection, this, &MainWindow::ReceiveStatusConnectionToDB); //Сигнал для подключения к БД
 
 }
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete ui;
+    delete dataDb;
+    delete dataBase;
+    delete msg;
 }
 
 /*!
  * @brief Слот отображает форму для ввода данных подключения к БД
  */
-void MainWindow::on_act_addData_triggered()
-{
-    //Отобразим диалоговое окно. Какой метод нужно использовать?
-    dataDb->show();
+void MainWindow::on_act_addData_triggered() {
+    dataDb->show(); //Отобразим диалоговое окно. Какой метод нужно использовать?
 }
 
 /*!

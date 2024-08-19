@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QMessageBox>
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 #include "database.h"
 #include "dbdata.h"
 

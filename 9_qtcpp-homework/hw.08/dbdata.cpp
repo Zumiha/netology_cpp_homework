@@ -2,23 +2,17 @@
 #include "database.h"
 #include "ui_dbdata.h"
 
-DbData::DbData(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::DbData)
-{
+DbData::DbData(QWidget *parent) : QDialog(parent), ui(new Ui::DbData) {
     ui->setupUi(this);
-
-
-    //Ресайзим вектор значений, по количеству полей необходимых для
-    //подключения к БД
+    //Ресайзим вектор значений, по количеству полей необходимых для подключения к БД
     data.resize(NUM_DATA_FOR_CONNECT_TO_DB);
-
 }
 
 DbData::~DbData()
 {
     delete ui;
 }
+
 /*!
  * \brief Обработчик кнопки "Ок"
  */
