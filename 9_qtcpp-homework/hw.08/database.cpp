@@ -1,10 +1,15 @@
 #include "database.h"
 
-DataBase::DataBase(QObject *parent) : QObject{parent} {
+DataBase::DataBase(QObject *parent)
+    : QObject{parent}
+{
     dataBase = new QSqlDatabase();
+    simpleQuery = new QSqlQuery();
+    tableWidget = new QTableWidget();
 }
 
-DataBase::~DataBase() {
+DataBase::~DataBase()
+{
     delete dataBase;
 }
 
@@ -22,7 +27,9 @@ void DataBase::AddDataBase(QString driver, QString nameDB) {
  * \param для удобства передаем контейнер с данными необходимыми для подключения
  * \return возвращает тип ошибки
  */
-void DataBase::ConnectToDataBase(QVector<QString> data) {
+void DataBase::ConnectToDataBase(QVector<QString> data)
+{
+
     dataBase->setHostName(data[hostName]);
     dataBase->setDatabaseName(data[dbName]);
     dataBase->setUserName(data[login]);
@@ -32,14 +39,19 @@ void DataBase::ConnectToDataBase(QVector<QString> data) {
 
     ///Тут должен быть код ДЗ
 
-    auto status = dataBase->open();
+
+    bool status;
+    status = dataBase->open();
     emit sig_SendStatusConnection(status);
+
 }
 /*!
  * \brief Метод производит отключение от БД
  * \param Имя БД
  */
-void DataBase::DisconnectFromDataBase(QString nameDb) {
+void DataBase::DisconnectFromDataBase(QString nameDb)
+{
+
     *dataBase = QSqlDatabase::database(nameDb);
     dataBase->close();
 
@@ -49,44 +61,59 @@ void DataBase::DisconnectFromDataBase(QString nameDb) {
  * \param request - SQL запрос
  * \return
  */
-
-void basicDBRequest(requestType _type) {
-    if (_type == requestAllFilms) {
-        this->RequestAll();
-    } else if (_type == requestComedy) {
-        RequestData("SELECT title, description FROM film f JOIN film_category fc on f.film_id = fc.film_id JOIN category c on c.category_id = fc.category_id WHERE c.name = 'Comedy'");
-    } else if (_type == requestComedy) {
-        RequestData("SELECT title, description FROM film f JOIN film_category fc on f.film_id = fc.film_id JOIN category c on c.category_id = fc.category_id WHERE c.name = 'Horror'");
-    }
-}
-
-void DataBase::RequestAll() {
-    QSqlTableModel model;
-    model.setQuery(nullptr, *dataBase);
-
-    model.setTable("film");
-    model.select();
-
-
-    emit sig_DataFromDB(model);
-}
-
 void DataBase::RequestToDB(QString request)
 {
+
     ///Тут должен быть код ДЗ
-    QSqlQueryModel model;
-    model.setQuery(request, *dataBase);
 
-    model->setHeaderData(0, Qt::Horizontal, tr("Название"));
-    model->setHeaderData(1, Qt::Horizontal, tr("Описание"));
+    *simpleQuery = QSqlQuery(*dataBase);
+    QSqlError err;
+    if(simpleQuery->exec(request) == false){
+        err = simpleQuery->lastError();
+    }
 
-    emit sig_DataFromDB(model);
+    emit sig_SendStatusRequest(err);
+}
+
+void DataBase::ReadAnswerFromDB(int requestType)
+{
+    switch (requestType) {
+    case requestAllFilms:
+    case requestComedy:
+    case requestHorrors:
+    case requestAllFilmsTableWidget:
+    {
+        tableWidget->setColumnCount(3);
+        tableWidget->setRowCount(0);
+        QStringList hdrs;
+        hdrs << "Название" << "Описание" << "Genre";
+        tableWidget->setHorizontalHeaderLabels(hdrs);
+
+        uint32_t conterRows = 0;
+
+        while(simpleQuery->next()){
+            QString str;
+            tableWidget->insertRow(conterRows);
+
+            for(int i = 0; i<tableWidget->columnCount(); ++i){
+                str = simpleQuery->value(i).toString();
+                QTableWidgetItem *item = new QTableWidgetItem(str);
+                tableWidget->setItem(tableWidget->rowCount() - 1, i, item);
+            }
+            ++conterRows;
+        }
+        emit sig_SendDataFromDB(tableWidget, requestAllFilms);
+        break;
+    }
+    default:
+        break;
+    }
+
 }
 
 /*!
  * @brief Метод возвращает последнюю ошибку БД
  */
-
 QSqlError DataBase::GetLastError()
 {
     return dataBase->lastError();

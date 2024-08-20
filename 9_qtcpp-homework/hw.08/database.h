@@ -3,10 +3,11 @@
 
 #include <QTableWidget>
 #include <QObject>
-#include <QtSql/QSqlDatabase>
-#include <QtSql/QSqlError>
-#include <QtSql/QSqlTableModel>
-#include <QtSql/QSqlQueryModel>
+#include <QSqlDataBase>
+#include <QSqlError>
+#include <QSqlQuery>
+
+
 
 #define POSTGRE_DRIVER "QPSQL"
 #define DB_NAME "MyDB"
@@ -24,11 +25,16 @@ enum fieldsForConnect{
 };
 
 //Типы запросов
-enum requestType {
+enum requestType{
+
     requestAllFilms = 1,
     requestComedy   = 2,
-    requestHorrors  = 3
+    requestHorrors  = 3,
+    requestAllFilmsTableWidget = 4
+
 };
+
+
 
 class DataBase : public QObject
 {
@@ -40,22 +46,26 @@ public:
 
     void AddDataBase(QString driver, QString nameDB = "");
     void DisconnectFromDataBase(QString nameDb = "");
-    void basicDBRequest(requestType type);
-    void RequestAll();
     void RequestToDB(QString request);
     QSqlError GetLastError(void);
     void ConnectToDataBase(QVector<QString> dataForConnect);
+    void ReadAnswerFromDB(int answerType);
+
 
 signals:
 
    void sig_SendDataFromDB(const QTableWidget *tableWg, int typeR);
    void sig_SendStatusConnection(bool);
-   void sig_DataFromDB(QSqlQueryModel model);
-   void sig_DataFromDB(QSqlTableModel model);
+   void sig_SendStatusRequest(QSqlError err);
+
+
 
 private:
 
     QSqlDatabase* dataBase;
+    QSqlQuery* simpleQuery;
+    QTableWidget* tableWidget;
+
 };
 
 #endif // DATABASE_H

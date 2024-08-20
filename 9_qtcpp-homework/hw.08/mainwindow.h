@@ -3,7 +3,7 @@
 
 #include <QMainWindow>
 #include <QMessageBox>
-#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent>
 #include "database.h"
 #include "dbdata.h"
 
@@ -26,6 +26,7 @@ public slots:
     void ScreenDataFromDB(const QTableWidget *widget, int typeRequest);
     void ReceiveStatusConnectionToDB(bool status);
 
+    void ReceiveStatusRequestToDB(QSqlError err);
 
 private slots:
     void on_act_addData_triggered();
@@ -45,10 +46,11 @@ private:
     DataBase* dataBase;
     QMessageBox* msg;
 
-    QString request = "SELECT title, release_year, c.name  FROM film f "
+    QString request = "SELECT title, release_year, c.name FROM film f "
                       "JOIN film_category fc on f.film_id = fc.film_id "
                       "JOIN category c on c.category_id  = fc.category_id";
 
+    QString request_title_descript = "";
 
 };
 #endif // MAINWINDOW_H
