@@ -27,18 +27,14 @@ void DataBase::AddDataBase(QString driver, QString nameDB) {
  * \param для удобства передаем контейнер с данными необходимыми для подключения
  * \return возвращает тип ошибки
  */
-void DataBase::ConnectToDataBase(QVector<QString> data)
-{
-
+void DataBase::ConnectToDataBase(QVector<QString> data) {
     dataBase->setHostName(data[hostName]);
     dataBase->setDatabaseName(data[dbName]);
     dataBase->setUserName(data[login]);
     dataBase->setPassword(data[pass]);
     dataBase->setPort(data[port].toInt());
 
-
     ///Тут должен быть код ДЗ
-
 
     bool status;
     status = dataBase->open();
@@ -49,9 +45,7 @@ void DataBase::ConnectToDataBase(QVector<QString> data)
  * \brief Метод производит отключение от БД
  * \param Имя БД
  */
-void DataBase::DisconnectFromDataBase(QString nameDb)
-{
-
+void DataBase::DisconnectFromDataBase(QString nameDb) {
     *dataBase = QSqlDatabase::database(nameDb);
     dataBase->close();
 
@@ -71,38 +65,78 @@ void DataBase::RequestToDB(QString request)
     if(simpleQuery->exec(request) == false){
         err = simpleQuery->lastError();
     }
+    // qDebug() << simpleQuery->executedQuery();
 
     emit sig_SendStatusRequest(err);
 }
 
-void DataBase::ReadAnswerFromDB(int requestType)
+void DataBase::ReadAnswerFromDB(int reqType)
 {
-    switch (requestType) {
+    switch (reqType) {
     case requestAllFilms:
+    {
+        if(tModel != nullptr) {
+            delete tModel;
+            tModel = nullptr;
+        }
+        tModel = new QSqlTableModel (nullptr, *dataBase);
+        tModel->setTable("film");
+        tModel->select();
+
+        tModel->setHeaderData(0, Qt::Horizontal, tr("Название"));
+        tModel->setHeaderData(1, Qt::Horizontal, tr("Описание"));
+
+        emit sig_SendDataFromDBtM(tModel, requestAllFilms);
+        break;
+    }
     case requestComedy:
     case requestHorrors:
+    {
+        auto request = simpleQuery->executedQuery();
+        // qDebug() << request;
+
+        QSqlQueryModel* model = new QSqlQueryModel;
+        model->setQuery(request,*dataBase);
+        // qDebug() << "Database to Model";
+
+        model->setHeaderData(0, Qt::Horizontal, tr("Название"));
+        model->setHeaderData(1, Qt::Horizontal, tr("Описание"));
+
+        // qModel->setQuery(request, *dataBase);
+        // qModel->setHeaderData(0, Qt::Horizontal, tr("Название"));
+        // qModel->setHeaderData(1, Qt::Horizontal, tr("Описание"));
+        qModel = model;
+
+        if (reqType == requestComedy) {
+            emit sig_SendDataFromDBqM(qModel, requestComedy);
+        }
+        else {
+            emit sig_SendDataFromDBqM(qModel, requestHorrors);
+        }
+        break;
+    }
     case requestAllFilmsTableWidget:
     {
-        tableWidget->setColumnCount(3);
-        tableWidget->setRowCount(0);
-        QStringList hdrs;
-        hdrs << "Название" << "Описание" << "Genre";
-        tableWidget->setHorizontalHeaderLabels(hdrs);
+        // tableWidget->setColumnCount(3);
+        // tableWidget->setRowCount(0);
+        // QStringList hdrs;
+        // hdrs << "Название" << "Описание" << "Genre";
+        // tableWidget->setHorizontalHeaderLabels(hdrs);
 
-        uint32_t conterRows = 0;
+        // uint32_t conterRows = 0;
 
-        while(simpleQuery->next()){
-            QString str;
-            tableWidget->insertRow(conterRows);
+        // while(simpleQuery->next()){
+        //     QString str;
+        //     tableWidget->insertRow(conterRows);
 
-            for(int i = 0; i<tableWidget->columnCount(); ++i){
-                str = simpleQuery->value(i).toString();
-                QTableWidgetItem *item = new QTableWidgetItem(str);
-                tableWidget->setItem(tableWidget->rowCount() - 1, i, item);
-            }
-            ++conterRows;
-        }
-        emit sig_SendDataFromDB(tableWidget, requestAllFilms);
+        //     for(int i = 0; i<tableWidget->columnCount(); ++i){
+        //         str = simpleQuery->value(i).toString();
+        //         QTableWidgetItem *item = new QTableWidgetItem(str);
+        //         tableWidget->setItem(tableWidget->rowCount() - 1, i, item);
+        //     }
+        //     ++conterRows;
+        // }
+        // emit sig_SendDataFromDB(tableWidget, requestAllFilmsTableWidget);
         break;
     }
     default:
