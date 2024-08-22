@@ -83,8 +83,9 @@ void DataBase::ReadAnswerFromDB(int reqType)
         tModel->setTable("film");
         tModel->select();
 
-        tModel->setHeaderData(0, Qt::Horizontal, tr("Название"));
-        tModel->setHeaderData(1, Qt::Horizontal, tr("Описание"));
+        tModel->setHeaderData(1, Qt::Horizontal, tr("Название"));
+        tModel->setHeaderData(2, Qt::Horizontal, tr("Описание"));
+        tModel->setHeaderData(3, Qt::Horizontal, tr("Жанр"));
 
         emit sig_SendDataFromDBtM(tModel, requestAllFilms);
         break;
@@ -101,6 +102,7 @@ void DataBase::ReadAnswerFromDB(int reqType)
 
         model->setHeaderData(0, Qt::Horizontal, tr("Название"));
         model->setHeaderData(1, Qt::Horizontal, tr("Описание"));
+        model->setHeaderData(2, Qt::Horizontal, tr("Жанр"));
 
         // qModel->setQuery(request, *dataBase);
         // qModel->setHeaderData(0, Qt::Horizontal, tr("Название"));
