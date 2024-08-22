@@ -87,6 +87,7 @@ void DataBase::ReadAnswerFromDB(int reqType)
         tModel->setHeaderData(2, Qt::Horizontal, tr("Описание"));
         tModel->setHeaderData(3, Qt::Horizontal, tr("Жанр"));
 
+
         emit sig_SendDataFromDBtM(tModel, requestAllFilms);
         break;
     }
@@ -107,7 +108,7 @@ void DataBase::ReadAnswerFromDB(int reqType)
         // qModel->setQuery(request, *dataBase);
         // qModel->setHeaderData(0, Qt::Horizontal, tr("Название"));
         // qModel->setHeaderData(1, Qt::Horizontal, tr("Описание"));
-        qModel = model;
+        qModel = std::move(model);
 
         if (reqType == requestComedy) {
             emit sig_SendDataFromDBqM(qModel, requestComedy);
