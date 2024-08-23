@@ -1,16 +1,22 @@
 #include "database.h"
 
-DataBase::DataBase(QObject *parent)
-    : QObject{parent}
-{
+DataBase::DataBase(QObject *parent) : QObject{parent} {
     dataBase = new QSqlDatabase();
     simpleQuery = new QSqlQuery();
     tableWidget = new QTableWidget();
+
+    tModel = new QSqlTableModel();
+    qModel = new QSqlQueryModel();
 }
 
 DataBase::~DataBase()
 {
     delete dataBase;
+    delete simpleQuery;
+    delete tableWidget;
+
+    delete tModel;
+    delete qModel;
 }
 
 /*!
@@ -72,21 +78,31 @@ void DataBase::RequestToDB(QString request)
 
 void DataBase::ReadAnswerFromDB(int reqType)
 {
+    auto request = simpleQuery->executedQuery();
+
     switch (reqType) {
     case requestAllFilms:
     {
+        // qDebug() << request;
         if(tModel != nullptr) {
             delete tModel;
             tModel = nullptr;
         }
         tModel = new QSqlTableModel (nullptr, *dataBase);
+        // qDebug() << "Database to Model";
         tModel->setTable("film");
         tModel->select();
-
+        // qDebug() << "Select() in tModel";
         tModel->setHeaderData(1, Qt::Horizontal, tr("Название"));
         tModel->setHeaderData(2, Qt::Horizontal, tr("Описание"));
-        tModel->setHeaderData(3, Qt::Horizontal, tr("Жанр"));
+        // qDebug() << "setHeader in model";
 
+
+        //Реализация tModel через setQuery
+
+        // tModel->setQuery(request, *dataBase);
+        // tModel->setHeaderData(1, Qt::Horizontal, tr("Название"));
+        // tModel->setHeaderData(2, Qt::Horizontal, tr("Описание"));
 
         emit sig_SendDataFromDBtM(tModel, requestAllFilms);
         break;
@@ -94,21 +110,10 @@ void DataBase::ReadAnswerFromDB(int reqType)
     case requestComedy:
     case requestHorrors:
     {
-        auto request = simpleQuery->executedQuery();
-        // qDebug() << request;
-
-        QSqlQueryModel* model = new QSqlQueryModel;
-        model->setQuery(request,*dataBase);
-        // qDebug() << "Database to Model";
-
-        model->setHeaderData(0, Qt::Horizontal, tr("Название"));
-        model->setHeaderData(1, Qt::Horizontal, tr("Описание"));
-        model->setHeaderData(2, Qt::Horizontal, tr("Жанр"));
-
-        // qModel->setQuery(request, *dataBase);
-        // qModel->setHeaderData(0, Qt::Horizontal, tr("Название"));
-        // qModel->setHeaderData(1, Qt::Horizontal, tr("Описание"));
-        qModel = std::move(model);
+        qModel->setQuery(request, *dataBase);
+        qModel->setHeaderData(0, Qt::Horizontal, tr("Название"));
+        qModel->setHeaderData(1, Qt::Horizontal, tr("Описание"));
+        qModel->setHeaderData(2, Qt::Horizontal, tr("Жанр"));
 
         if (reqType == requestComedy) {
             emit sig_SendDataFromDBqM(qModel, requestComedy);

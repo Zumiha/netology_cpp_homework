@@ -10,6 +10,7 @@
 #include <QSqlQueryModel>
 #include <QSqlTableModel>
 
+#include <QConcatenateTablesProxyModel>
 
 #define POSTGRE_DRIVER "QPSQL"
 #define DB_NAME "MyDB"
@@ -70,7 +71,7 @@ private:
     QSqlQuery* simpleQuery;
     QTableWidget* tableWidget;
 
-    QSqlTableModel* tModel = nullptr;
+    QSqlTableModel* tModel;
     QSqlQueryModel* qModel;
 
 };

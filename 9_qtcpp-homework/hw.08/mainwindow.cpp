@@ -104,7 +104,7 @@ void MainWindow::on_pb_request_clicked()
 {    ///Тут должен быть код ДЗ
 
     if (ui->cb_category->currentText() == "Все") {
-        request_title_descript = "SELECT title, description, c.name FROM film f "
+        request_title_descript = "SELECT * FROM film f "
                                  "JOIN film_category fc on f.film_id = fc.film_id "
                                  "JOIN category c on c.category_id  = fc.category_id";
     } else if (ui->cb_category->currentText() == "Ужасы") {
@@ -185,11 +185,13 @@ void MainWindow::ScreenDataFromDBtM(QSqlTableModel *model, int typeRequest)
 {
     ui->tb_result->setModel(model);
     ui->tb_result->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    ui->tb_result->hideColumn(0);
-    for(int i = 3; i < ui->tb_result->model()->columnCount(); ++i)
-    {
+
+    for(int i = 0; i < ui->tb_result->model()->columnCount(); ++i) {
         ui->tb_result->hideColumn(i);
     }
+
+    ui->tb_result->showColumn(1);
+    ui->tb_result->showColumn(2);
 }
 
 /*!
