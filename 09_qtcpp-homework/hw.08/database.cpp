@@ -26,6 +26,7 @@ DataBase::~DataBase()
  */
 void DataBase::AddDataBase(QString driver, QString nameDB) {
     *dataBase = QSqlDatabase::addDatabase(driver, nameDB);
+    tModel = new QSqlTableModel (nullptr, *dataBase);
 }
 
 /*!
@@ -84,11 +85,6 @@ void DataBase::ReadAnswerFromDB(int reqType)
     case requestAllFilms:
     {
         // qDebug() << request;
-        if(tModel != nullptr) {
-            delete tModel;
-            tModel = nullptr;
-        }
-        tModel = new QSqlTableModel (nullptr, *dataBase);
         // qDebug() << "Database to Model";
         tModel->setTable("film");
         tModel->select();
