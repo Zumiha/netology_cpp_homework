@@ -49,8 +49,8 @@ void MainWindow::StartRace(void){
         auto mutexOn = ui->concr_mutexed->isChecked();
 
         auto concr_race1 = QtConcurrent::run([this, mutexOn, initNum]() {concurRace1->DoWork(&number, mutexOn, initNum);});
+		concr_race1.waitForFinished();
         auto concr_race2 = QtConcurrent::run([this, mutexOn, initNum]() {concurRace2->DoWork(&number, mutexOn, initNum);});
-        concr_race1.waitForFinished();
         concr_race2.waitForFinished();
     }
     else{
