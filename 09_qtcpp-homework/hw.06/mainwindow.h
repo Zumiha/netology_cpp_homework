@@ -23,7 +23,7 @@ public:
 private slots:
 
     void on_pb_start_clicked();
-    void on_rb_qtConcur_toggled();
+    // void on_rb_qtConcur_toggled();
 
     void countResult();
 

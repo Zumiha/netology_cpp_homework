@@ -25,6 +25,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(concurRace1, &ExampleRace::sig_Finish, this, &MainWindow::countResult);
     connect(concurRace2, &ExampleRace::sig_Finish, this, &MainWindow::countResult);
 
+    connect(ui->rb_qtConcur, &QRadioButton::toggled, this, [&]{
+        if (ui->rb_qtConcur->isChecked()) {
+            ui->concr_mutexed->setEnabled(true);
+        } else {
+            ui->concr_mutexed->setEnabled(false);
+        }
+    });
+
 }
 
 MainWindow::~MainWindow()
@@ -59,13 +67,13 @@ void MainWindow::StartRace(void){
     }
 }
 
-void MainWindow::on_rb_qtConcur_toggled() {
-    if (ui->rb_qtConcur->isChecked()) {
-        ui->concr_mutexed->setEnabled(true);
-    } else {
-        ui->concr_mutexed->setEnabled(false);
-    }
-}
+// void MainWindow::on_rb_qtConcur_toggled() {
+//     if (ui->rb_qtConcur->isChecked()) {
+//         ui->concr_mutexed->setEnabled(true);
+//     } else {
+//         ui->concr_mutexed->setEnabled(false);
+//     }
+// }
 
 //Обработка кнопки "Старт"
 void MainWindow::on_pb_start_clicked()
