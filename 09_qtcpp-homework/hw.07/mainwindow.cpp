@@ -6,184 +6,237 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->rb_cos->setChecked(true);
-    //Создаем объект нашего класса
-    graphClass = new Graphic(ui->customPlot, NUM_GRAPH);
+    ui->pb_clearResult->setCheckable(true);
+
 
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete graphClass;
 }
 
-/*!
-    @brief Метод обрабатывает нажатие кнопки "Очистить"
-*/
-void MainWindow::on_pb_clear_clicked()
-{
-    graphClass->ClearGraph(ui->customPlot);
-}
 
+
+/****************************************************/
 /*!
-    @brief Метод обрабатывает нажатие кнопки "Построить"
+@brief:	Метод считывает данные из файла
+@param: path - путь к файлу
+        numberChannel - какой канал АЦП считать
 */
-void MainWindow::on_pb_updGraph_clicked()
+/****************************************************/
+QVector<uint32_t> MainWindow::ReadFile(QString path, uint8_t numberChannel)
 {
 
-    //Перед новой отрисовкой очистим графики
-    graphClass->ClearGraph(ui->customPlot);
+    QFile file(path);
+    file.open(QIODevice::ReadOnly);
 
-    /*
-        Создаем контейнеры для хранения данных
-    */
-    QVector<double> x;
-    QVector<double> y;
+    if(file.isOpen() == false){
 
-    /*
-        считываем шаг сетки и граничные значения
-    */
-    double step = ui->dsB_step->value();
-    //Шаг не может быть равен нулю
-    if(step <= 0){
-        step = 0.1;
-        ui->dsB_step->setValue(0.1);
-    }
-
-    double minVal = ui->dsB_minRange->value();
-    double maxVal = ui->dsB_maxRange->value() + step; //Учитываем ноль
-
-    /*
-        Формируем сетку значений, ресайзим вектор и заполняем его
-    */
-    double steps = round(((maxVal-minVal)/step));
-    x.resize(steps);
-    x[0] = minVal; //Начинакем с минимального значения
-    for(int i = 1; i<steps; i++){
-        x[i] = x[i-1]+step;
-    }
-
-    /*
-     * Заполняем массив значений в зависимости
-     * от выбранного флажка
-     */
-    y.resize(steps);
-    //Если выбран косинус
-    if(ui->rb_cos->isChecked()){
-        for(int i = 0; i<steps; i++){
-            y[i] = cos(x[i]);
+        if(pathToFile.isEmpty()){
+            QMessageBox mb;
+            mb.setWindowTitle("Ошибка");
+            mb.setText("Ошибка открытия фала");
+            mb.exec();
         }
-        graphClass->AddDataToGrahp(x, y, FIRST_GRAPH);
     }
-    else if(ui->rb_sinx_x->isChecked()){
-        for(int i = 0; i<steps; i++){
-            y[i] = sin(x[i])/(x[i]);
-        }
-        graphClass->AddDataToGrahp(x, y, FIRST_GRAPH);
-    }
-    else if(ui->rb_mouse->isChecked()){
+    else{
 
-        minVal = -7;
-        step = 0.01;
-        maxVal = 7+step;
-        steps = round(((maxVal-minVal)/step));
-        x.clear();
-        x.resize(steps);
-        x[0] = minVal;
-        for(int i = 1; i<steps; i++){
-            x[i] = x[i-1]+step;
-        }
-
-        QVector<double> data;
-        data.resize(steps);
-        y.clear();
-        y.resize(steps);
-
-        for(int i = 0; i<2; i++){
-            data = ConstructMouse(i, x);
-            graphClass->AddDataToGrahp(x, data, i);
-            data.clear();
-        }
-
+        //продумать как выйти из функции
     }
 
-    graphClass->UpdateGraph(ui->customPlot);
+    QDataStream dataStream;
+    dataStream.setDevice(&file);
+    dataStream.setByteOrder(QDataStream::LittleEndian);
 
+    QVector<uint32_t> readData;
+    readData.clear();
+    uint32_t currentWorld = 0, sizeFrame = 0;
+
+    while(dataStream.atEnd() == false){
+
+        dataStream >> currentWorld;
+
+        if(currentWorld == 0xFFFFFFFF){
+
+            dataStream >> currentWorld;
+
+            if(currentWorld < 0x80000000){
+
+                dataStream >> sizeFrame;
+
+                if(sizeFrame > 1500){
+                    continue;
+                }
+
+                for(int i = 0; i<sizeFrame/sizeof(uint32_t); i++){
+
+                    dataStream >> currentWorld;
+
+                    if((currentWorld >> 24) == numberChannel){
+
+                        readData.append(currentWorld);
+
+                    }
+                }
+            }
+        }
+    }
+    ui->chB_readSucces->setChecked(true);
+    return readData;
 }
 
+QVector<double> MainWindow::ProcessFile(const QVector<uint32_t> dataFile)
+{
+    QVector<double> resultData;
+    resultData.clear();
 
+    foreach (int word, dataFile) {
+        word &= 0x00FFFFFF;
+        if(word > 0x800000){
+            word -= 0x1000000;
+        }
 
-/*!
-    @brief Метод строит лого Бэтмена
-*/
-QVector<double> MainWindow::ConstructMouse(int numForm, QVector<double> x)
+        double res = ((double)word/6000000)*10;
+        resultData.append(res);
+    }
+    ui->chB_procFileSucces->setChecked(true);
+
+    return resultData;
+}
+
+QVector<double> MainWindow::FindMax(QVector<double> resultData)
+{
+    double max = 0, sMax=0;
+    //Поиск первого максиума
+    foreach (double num, resultData){
+        //QThread::usleep(1);
+        if(num > max){
+            max = num;
+        }
+    }
+
+    //Поиск 2го максимума
+    foreach (double num, resultData){
+        //QThread::usleep(1);
+        if(num > sMax && (qFuzzyCompare(num, max) == false)){
+            sMax = num;
+        }
+    }
+
+    QVector<double> maxs = {max, sMax};
+    ui->chB_maxSucess->setChecked(true);
+    return maxs;
+}
+
+QVector<double> MainWindow::FindMin(QVector<double> resultData)
 {
 
-    QVector<double> result;
-    result.resize(x.size());
-
-    double tmpX = 0;
-    if(numForm == 0){
-
-        for(int i = 0; i<x.size(); i++){
-            tmpX = abs(x[i]);
-
-            if(tmpX>7){
-
-                continue;
-
-            }
-            else if (tmpX < 0.5){
-
-                result[i] = 2.25;
-
-            }
-            else if(0.5 <= tmpX  && tmpX < 0.75 ){
-
-                result[i] = 3 * tmpX + 0.75;
-
-            }
-            else if (0.75 <= tmpX && tmpX< 1.0){
-
-                result[i] = 9 - 8 * tmpX;
-
-            }
-            else if(1 <= tmpX && tmpX < 3){
-
-                result[i] = (1.5 - 0.5 * tmpX - 3 * sqrt(10) / 7 * (sqrt(3 - tmpX*tmpX + 2 * tmpX) - 2));
-
-            }
-            else if(3 <= tmpX && tmpX <= 7){
-
-                result[i] = 3 * sqrt(-((tmpX / 7)*(tmpX / 7)) + 1);
-
-            }
-
+    double min = 0, sMin = 0;
+    QThread::sleep(1);
+    //Поиск первого максиума
+    foreach (double num, resultData){
+        if(num < min){
+            min = num;
         }
     }
-    else if(numForm == 1){
-
-        for(int i = 0; i< x.size(); i++){
-
-            tmpX = abs(x[i]);
-
-            if(tmpX > 7){
-                continue;
-            }
-            else if(0 <= tmpX && tmpX< 4 ){
-
-                result[i] = (abs(tmpX / 2) - (3*sqrt(33) - 7) / 112 * tmpX*tmpX + sqrt(1 - (abs(tmpX - 2) - 1)*(abs(tmpX - 2) - 1)) - 3);
-            }
-            else if(4 <= tmpX && tmpX <= 7){
-
-                result[i] = -3 * sqrt(-((tmpX / 7)*(tmpX / 7)) + 1);
-            }
+    QThread::sleep(1);
+    //Поиск 2го максимума
+    foreach (double num, resultData){
+        if(num < sMin && (qFuzzyCompare(num, min) == false)){
+            sMin = num;
         }
     }
 
-    return result;
+    QVector<double> mins = {min, sMin};
+    ui->chB_minSucess->setChecked(true);
+    return mins;
+
 }
 
+void MainWindow::DisplayResult(QVector<double> mins, QVector<double> maxs)
+{
+    ui->te_Result->append("Расчет закончен!");
+
+    ui->te_Result->append("Первый минимум " + QString::number(mins.first()));
+    ui->te_Result->append("Второй минимум " + QString::number(mins.at(1)));
+
+    ui->te_Result->append("Первый максимум " + QString::number(maxs.first()));
+    ui->te_Result->append("Второй максимум " + QString::number(maxs.at(1)));
+}
+
+
+/****************************************************/
+/*!
+@brief:	Обработчик клика на кнопку "Выбрать путь"
+*/
+/****************************************************/
+void MainWindow::on_pb_path_clicked()
+{
+    pathToFile = "";
+    ui->le_path->clear();
+
+    pathToFile =  QFileDialog::getOpenFileName(this,
+                                              tr("Открыть файл"), "/home/", tr("ADC Files (*.adc)"));
+
+    ui->le_path->setText(pathToFile);
+}
+
+/****************************************************/
+/*!
+@brief:	Обработчик клика на кнопку "Старт"
+*/
+/****************************************************/
+void MainWindow::on_pb_start_clicked()
+{
+    //проверка на то, что файл выбран
+    if(pathToFile.isEmpty()){
+
+        QMessageBox mb;
+        mb.setWindowTitle("Ошибка");
+        mb.setText("Выберите файл!");
+        mb.exec();
+        return;
+    }
+
+    ui->chB_maxSucess->setChecked(false);
+    ui->chB_procFileSucces->setChecked(false);
+    ui->chB_readSucces->setChecked(false);
+    ui->chB_minSucess->setChecked(false);
+
+    int selectIndex = ui->cmB_numCh->currentIndex();
+    //Маски каналов
+    if(selectIndex == 0){
+        numberSelectChannel = 0xEA;
+    }
+    else if(selectIndex == 1){
+        numberSelectChannel = 0xEF;
+    }
+    else if(selectIndex == 2){
+        numberSelectChannel = 0xED;
+    }
+
+
+    auto read = [&]{ return ReadFile(pathToFile, numberSelectChannel); };
+    auto process = [&](QVector<uint32_t> res){ return ProcessFile(res);};
+    auto findMax = [&](QVector<double> res){
+                                                maxs = FindMax(res);
+                                                mins = FindMin(res);
+                                                DisplayResult(mins, maxs);
+
+                                                /*
+                                                 * Тут необходимо реализовать код наполнения серии
+                                                 * и вызов сигнала для отображения графика
+                                                 */
+
+                                             };
+
+    auto result = QtConcurrent::run(read)
+                               .then(process)
+                               .then(findMax);
+
+
+
+}
 
 
