@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(CustomPlotGraphic VERSION 0.1 LANGUAGES CXX)
+project(PlotGraphics VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -11,7 +11,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets Concurrent PrintSupport)
+find_package(Qt6 REQUIRED COMPONENTS Widgets Charts Concurrent)
 
 
 set(PROJECT_SOURCES
@@ -22,18 +22,15 @@ set(PROJECT_SOURCES
 )
 
 
-qt_add_executable(CustomPlotGraphic
+qt_add_executable(PlotGraphics
 	MANUAL_FINALIZATION
 	${PROJECT_SOURCES}
 )
 
-add_compile_definitions(QCUSTOMPLOT_USE_LIBRARY)
-
 target_link_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(CustomPlotGraphic PRIVATE	Qt6::Widgets
-											Qt6::Concurrent
-											Qt6::PrintSupport
-											qcustomplot2.dll
-											)
+target_link_libraries(PlotGraphics PRIVATE	Qt6::Widgets
+                                                Qt6::Charts
+                                                Qt6::Concurrent
+                                                )
 											
-qt_finalize_executable(CustomPlotGraphic)
+qt_finalize_executable(PlotGraphics)

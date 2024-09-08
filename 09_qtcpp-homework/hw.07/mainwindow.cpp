@@ -8,15 +8,40 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->pb_clearResult->setCheckable(true);
 
+    mp_showGraph = new QAction("Окно графиков", this);
+    mp_showGraph->setCheckable(true);
+    mp_showGraph->setChecked(false);
 
+    line_series = new QLineSeries;
+    chart = new QChart;
+    chart_view = new QChartView;
+
+    QMenu* graph_menu = menuBar()->addMenu("Графики");
+    graph_menu->addAction(mp_showGraph);
+    connect(mp_showGraph, &QAction::triggered, this, &MainWindow::slot_showGraph);
+    connect(ui->pb_clearResult, &QPushButton::clicked, this, &MainWindow::ClearGraph);
+
+    connect(this, &MainWindow::signal_toPlot, this, &MainWindow::slot_ChartData);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete line_series;
+    delete chart;
+    delete chart_view;
 }
 
+void MainWindow::slot_showGraph () {
+    if(!mp_showGraph) {return;}
 
+    // qDebug() << "Тест";
+    if(mp_showGraph->isChecked()) {
+        // qDebug() << "Показываем окно графиков";
+    } else {
+        // qDebug() << "Не показываем окно графиков";
+    }
+}
 
 /****************************************************/
 /*!
@@ -41,6 +66,9 @@ QVector<uint32_t> MainWindow::ReadFile(QString path, uint8_t numberChannel)
         }
     }
     else{
+
+
+
 
         //продумать как выйти из функции
     }
@@ -165,6 +193,21 @@ void MainWindow::DisplayResult(QVector<double> mins, QVector<double> maxs)
     ui->te_Result->append("Второй максимум " + QString::number(maxs.at(1)));
 }
 
+void MainWindow::ClearGraph()
+{
+    line_series->clear();
+    chart->removeSeries(line_series);
+}
+
+void MainWindow::slot_ChartData() {
+    chart->setTitle("Data Display");
+    chart->addSeries(line_series);
+    chart->createDefaultAxes();
+
+    chart_view->setChart(chart);
+    chart_view->show();
+}
+
 
 /****************************************************/
 /*!
@@ -177,7 +220,10 @@ void MainWindow::on_pb_path_clicked()
     ui->le_path->clear();
 
     pathToFile =  QFileDialog::getOpenFileName(this,
-                                              tr("Открыть файл"), "/home/", tr("ADC Files (*.adc)"));
+                                              tr("Открыть файл"),
+                                              QStandardPaths::writableLocation(QStandardPaths::DownloadLocation),
+                                              tr("ADC Files (*.adc)")
+                                              );
 
     ui->le_path->setText(pathToFile);
 }
@@ -189,6 +235,7 @@ void MainWindow::on_pb_path_clicked()
 /****************************************************/
 void MainWindow::on_pb_start_clicked()
 {
+    ClearGraph();
     //проверка на то, что файл выбран
     if(pathToFile.isEmpty()){
 
@@ -224,19 +271,15 @@ void MainWindow::on_pb_start_clicked()
                                                 mins = FindMin(res);
                                                 DisplayResult(mins, maxs);
 
-                                                /*
-                                                 * Тут необходимо реализовать код наполнения серии
-                                                 * и вызов сигнала для отображения графика
-                                                 */
-
+                                                // код наполнения серии и вызов сигнала для отображения графика
+                                                auto freq = 1000.0;
+                                                for(int i = 0; i < freq; ++i){
+                                                    line_series->append(i, res[i]);
+                                                }
+                                                if (mp_showGraph->isChecked()) emit signal_toPlot();
                                              };
 
-    auto result = QtConcurrent::run(read)
-                               .then(process)
-                               .then(findMax);
-
-
-
+    auto result = QtConcurrent::run(read).then(process).then(findMax);
 }
 
 

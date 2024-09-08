@@ -8,11 +8,12 @@
 #include <QtGlobal>
 #include <QtConcurrent>
 #include <algorithm>
+#include <QStandardPaths>
 
 ///Подключаем все что нужно для графиков
-#include <QLineSeries>
-#include <QtCharts>
-#include <QChartView>
+
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QChartView>
 
 #define FD 1000.0 //частота дискретизации
 
@@ -36,15 +37,19 @@ public:
     //Метод ищет минимумы
     QVector<double> FindMin(QVector<double> resultData);
     //Метод отображает результаты
+    void ClearGraph();
     void DisplayResult(QVector<double> mins, QVector<double> maxs);
 
+signals:
+    void signal_toPlot();
 
 
 private slots:
     void on_pb_path_clicked();
     void on_pb_start_clicked();
 
-
+    void slot_showGraph();
+    void slot_ChartData();
 
 private:
     Ui::MainWindow *ui;
@@ -55,5 +60,10 @@ private:
     QVector<double> procesData;
     QVector<double> mins, maxs;
 
+    QPointer<QAction> mp_showGraph = nullptr;
+
+    QLineSeries *line_series;
+    QChart *chart;
+    QChartView *chart_view;
 };
 #endif // MAINWINDOW_H

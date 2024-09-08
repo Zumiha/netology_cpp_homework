@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 13.0.0, 2024-09-05T16:15:13. -->
+<!-- Written by QtCreator 13.0.0, 2024-09-08T15:35:31. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -393,9 +393,9 @@
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="bool" key="PE.EnvironmentAspect.PrintOnRun">false</value>
     <value type="QString" key="PerfRecordArgsId">-e cpu-cycles --call-graph &quot;dwarf,4096&quot; -F 250</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">CustomPlotGraphic</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeRunConfiguration.CustomPlotGraphic</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">CustomPlotGraphic</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">PlotGraphics</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">CMakeProjectManager.CMakeRunConfiguration.PlotGraphics</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">PlotGraphics</value>
     <value type="bool" key="ProjectExplorer.RunConfiguration.Customized">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
