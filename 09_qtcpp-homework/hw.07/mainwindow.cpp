@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowTitle("Обработка данных");
     ui->pb_clearResult->setCheckable(true);
 
     mp_showGraph = new QAction("Окно графиков", this);
@@ -200,11 +201,12 @@ void MainWindow::ClearGraph()
 }
 
 void MainWindow::slot_ChartData() {
-    chart->setTitle("Data Display");
+    chart->setTitle("Данные");
     chart->addSeries(line_series);
     chart->createDefaultAxes();
 
     chart_view->setChart(chart);
+    chart_view->setWindowTitle("График");
     chart_view->show();
 }
 
