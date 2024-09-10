@@ -7,8 +7,8 @@
 #include <QMessageBox>
 #include <QtGlobal>
 #include <QtConcurrent>
-#include <algorithm>
 #include <QStandardPaths>
+#include <QProgressDialog>
 
 ///Подключаем все что нужно для графиков
 

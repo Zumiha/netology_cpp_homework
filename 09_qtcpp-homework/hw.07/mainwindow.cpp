@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     mp_showGraph = new QAction("Окно графиков", this);
     mp_showGraph->setCheckable(true);
-    mp_showGraph->setChecked(false);
+    mp_showGraph->setChecked(true);
 
     line_series = new QLineSeries;
     chart = new QChart;
@@ -235,10 +235,10 @@ void MainWindow::on_pb_path_clicked()
 /****************************************************/
 void MainWindow::on_pb_start_clicked()
 {
+    ui->te_Result->setText("");
     ClearGraph();
     //проверка на то, что файл выбран
     if(pathToFile.isEmpty()){
-
         QMessageBox mb;
         mb.setWindowTitle("Ошибка");
         mb.setText("Выберите файл!");
@@ -263,23 +263,40 @@ void MainWindow::on_pb_start_clicked()
         numberSelectChannel = 0xED;
     }
 
-
+    auto block_bttn = [&] {
+        ui->pb_start->setEnabled(false);
+        ui->pb_clearResult->setEnabled(false);
+        ui->pb_path->setEnabled(false);
+        ui->cmB_numCh->setEnabled(false);
+        ui->spinBox->setEnabled(false);
+        menuBar()->setEnabled(false);
+        ui->te_Result->append("Чтение файла.");
+    };
     auto read = [&]{ return ReadFile(pathToFile, numberSelectChannel); };
     auto process = [&](QVector<uint32_t> res){ return ProcessFile(res);};
     auto findMax = [&](QVector<double> res){
-                                                maxs = FindMax(res);
-                                                mins = FindMin(res);
-                                                DisplayResult(mins, maxs);
+        ui->te_Result->append("Расчет данных.");
+        maxs = FindMax(res);
+        mins = FindMin(res);
+        DisplayResult(mins, maxs);
 
-                                                // код наполнения серии и вызов сигнала для отображения графика
-                                                auto freq = 1000.0;
-                                                for(int i = 0; i < freq; ++i){
-                                                    line_series->append(i, res[i]);
-                                                }
-                                                if (mp_showGraph->isChecked()) emit signal_toPlot();
-                                             };
+        // код наполнения серии и вызов сигнала для отображения графика
+        auto freq = 1000.0;
+        for(int i = 0; i < freq; ++i){
+            line_series->append(i, res[i]);
+        }
+        if (mp_showGraph->isChecked()) emit signal_toPlot();
+    };
+    auto unblock_bttn = [&] {
+        ui->pb_start->setEnabled(true);
+        ui->pb_clearResult->setEnabled(true);
+        ui->pb_path->setEnabled(true);
+        ui->cmB_numCh->setEnabled(true);
+        ui->spinBox->setEnabled(true);
+        menuBar()->setEnabled(true);
+    };
 
-    auto result = QtConcurrent::run(read).then(process).then(findMax);
+    auto result = QtConcurrent::run(block_bttn).then(read).then(process).then(findMax).then(unblock_bttn);
 }
 
 
