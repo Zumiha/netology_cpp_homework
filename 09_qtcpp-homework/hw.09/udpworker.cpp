@@ -1,19 +1,11 @@
 #include "udpworker.h"
 
-UDPworker::UDPworker(QObject *parent) : QObject(parent)
-{
-
-
-
-}
-
+UDPworker::UDPworker(QObject *parent) : QObject(parent) {}
 
 /*!
  * @brief Метод инициализирует UDP сервер
  */
-void UDPworker::InitSocket()
-{
-
+void UDPworker::InitSocket() {
     serviceUdpSocket = new QUdpSocket(this);
     /*
      * Соединяем присваиваем адрес и порт серверу и соединяем функцию
@@ -22,7 +14,6 @@ void UDPworker::InitSocket()
     serviceUdpSocket->bind(QHostAddress::LocalHost, BIND_PORT);
 
     connect(serviceUdpSocket, &QUdpSocket::readyRead, this, &UDPworker::readPendingDatagrams);
-
 }
 
 /*!
