@@ -25,12 +25,24 @@ void UDPworker::ReadDatagram(QNetworkDatagram datagram)
     QByteArray data;
     data = datagram.data();
 
-
     QDataStream inStr(&data, QIODevice::ReadOnly);
-    QDateTime dateTime;
-    inStr >> dateTime;
 
-    emit sig_sendTimeToGUI(dateTime);
+    msgType type;
+    inStr >> type;
+
+    if (type == msgType::Default) {
+        QDateTime dateTime;
+        inStr >> dateTime;
+        emit sig_sendTimeToGUI(dateTime);
+    } else {
+        QString data;
+        inStr >> data;
+        QString text;
+        text.append("Принято сообщение от ").append(datagram.senderAddress().toString()).append(" размер сообщения(байт): ").append(QString::number(data.size()));
+        emit sig_sendDataToGUI(text);
+        // qDebug() << "User input";
+    }
+
 }
 /*!
  * @brief Метод осуществляет опередачу датаграммы

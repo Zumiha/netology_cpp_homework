@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     udpWorker->InitSocket();
 
     connect(udpWorker, &UDPworker::sig_sendTimeToGUI, this, &MainWindow::DisplayTime);
+    connect(udpWorker, &UDPworker::sig_sendDataToGUI, this, &MainWindow::DisplayData);
 
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [&]{
@@ -20,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
         QByteArray dataToSend;
         QDataStream outStr(&dataToSend, QIODevice::WriteOnly);
 
+        outStr << msgType::Default;
         outStr << dateTime;
 
         udpWorker->SendDatagram(dataToSend);
@@ -27,36 +29,36 @@ MainWindow::MainWindow(QWidget *parent)
 
     });
 
+    connect(ui->pb_user_data, &QPushButton::clicked, this, [&]{
+
+        QByteArray dataToSend;
+        QDataStream outStr(&dataToSend, QIODevice::WriteOnly);
+
+        outStr << msgType::User;
+        outStr << ui->le_user_input->text();
+
+        udpWorker->SendDatagram(dataToSend);
+    });
+
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
+MainWindow::~MainWindow() {delete ui;}
+void MainWindow::on_pb_start_clicked() {timer->start(TIMER_DELAY);}
+void MainWindow::on_pb_stop_clicked() {timer->stop();}
 
-
-void MainWindow::on_pb_start_clicked()
-{
-    timer->start(TIMER_DELAY);
-}
-
-
-void MainWindow::DisplayTime(QDateTime data)
-{
+void MainWindow::DisplayTime(QDateTime data) {
     counterPck++;
     if(counterPck % 20 == 0){
         ui->te_result->clear();
     }
-
-    ui->te_result->append("Текущее время: " + data.toString() + ". "
-                "Принято пакетов " + QString::number(counterPck));
-
-
+    ui->te_result->append("Текущее время: " + data.toString() + ". Принято пакетов " + QString::number(counterPck));
 }
 
-
-void MainWindow::on_pb_stop_clicked()
-{
-    timer->stop();
+void MainWindow::DisplayData(QString data) {
+    counterPck++;
+    if(counterPck % 20 == 0){
+        ui->te_result->clear();
+    }
+    ui->te_result->append(data);
 }
 

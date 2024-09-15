@@ -8,6 +8,11 @@
 
 #define BIND_PORT 12345
 
+enum msgType {
+    Default,
+    User
+};
+
 class UDPworker : public QObject
 {
     Q_OBJECT
@@ -26,6 +31,7 @@ private:
 
 signals:
     void sig_sendTimeToGUI(QDateTime data);
+    void sig_sendDataToGUI(QString data);
 
 };
 

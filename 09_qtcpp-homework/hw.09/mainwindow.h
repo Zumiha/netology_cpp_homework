@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include <QDebug>
 #include "UdpWorker.h"
 
 #define TIMER_DELAY 1000
@@ -22,6 +23,7 @@ public:
 private slots:
     void on_pb_start_clicked();
     void DisplayTime(QDateTime data);
+    void DisplayData(QString data);
     void on_pb_stop_clicked();
 
 private:
