@@ -30,6 +30,7 @@ private:
     Ui::MainWindow *ui;
     QTimer* timer;
     UDPworker* udpWorker;
+    UDPworker* udpService;
     uint32_t counterPck = 0;
 
 

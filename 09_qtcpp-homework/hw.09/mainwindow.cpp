@@ -8,7 +8,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     udpWorker = new UDPworker(this);
+    udpService = new UDPworker(this);
     udpWorker->InitSocket();
+    udpService->InitSocket();
 
     connect(udpWorker, &UDPworker::sig_sendTimeToGUI, this, &MainWindow::DisplayTime);
     connect(udpWorker, &UDPworker::sig_sendDataToGUI, this, &MainWindow::DisplayData);
@@ -37,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
         outStr << msgType::User;
         outStr << ui->le_user_input->text();
 
-        udpWorker->SendDatagram(dataToSend);
+        udpService->SendDatagram(dataToSend);
     });
 
 }
