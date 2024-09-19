@@ -7,7 +7,7 @@
     {
       "type": "wokwi-resistor",
       "id": "r1",
-      "top": 33.6,
+      "top": 81.6,
       "left": 105.05,
       "rotate": 90,
       "attrs": { "value": "300" }
@@ -15,7 +15,7 @@
     {
       "type": "wokwi-resistor",
       "id": "r2",
-      "top": 33.6,
+      "top": 81.6,
       "left": 124.25,
       "rotate": 90,
       "attrs": { "value": "300" }
@@ -23,7 +23,7 @@
     {
       "type": "wokwi-resistor",
       "id": "r3",
-      "top": 33.6,
+      "top": 81.6,
       "left": 85.85,
       "rotate": 90,
       "attrs": { "value": "300" }
@@ -31,8 +31,8 @@
     {
       "type": "wokwi-rgb-led",
       "id": "rgb1",
-      "top": -130.4,
-      "left": 97.1,
+      "top": -24.8,
+      "left": 106.7,
       "attrs": { "common": "anode" }
     }
   ],
@@ -51,7 +51,7 @@
     [ "rgb:G", "r1:1", "green", [ "v38.4", "h10.9" ] ],
     [ "rgb:B", "r2:1", "green", [ "v19.2", "h11.2" ] ],
     [ "uno:5V", "rgb:COM", "red", [ "v19.1", "h-169", "v-412.8", "h124.8" ] ],
-    [ "uno:5V", "rgb1:COM", "red", [ "v19.1", "h-178.6", "v-374.4", "h134.4" ] ]
+    [ "uno:5V", "rgb1:COM", "red", [ "v19.1", "h-178.6", "v-297.6", "h143.9" ] ]
   ],
   "dependencies": {}
 }
