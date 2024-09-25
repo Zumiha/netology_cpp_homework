@@ -8,24 +8,34 @@
  * Поскольку типы данных не стандартные перегрузим оператор << Для работы с ServiceHeader
 */
 QDataStream &operator >>(QDataStream &out, ServiceHeader &data){
+    out >> data.id;     //Идентификатор начала пакета
+    out >> data.idData; //Идентификатор типа данных
+    out >> data.status; //Тип сообщения (запрос/ответ)
+    out >> data.len;    //Длина пакета далее, байт
 
-    out >> data.id;
-    out >> data.idData;
-    out >> data.status;
-    out >> data.len;
     return out;
-};
-QDataStream &operator <<(QDataStream &in, ServiceHeader &data){
+}
 
+QDataStream &operator <<(QDataStream &in, ServiceHeader &data){
     in << data.id;
     in << data.idData;
     in << data.status;
     in << data.len;
 
     return in;
-};
+}
 
+QDataStream &operator >>(QDataStream &out, StatServer &data){
 
+    out >> data.incBytes;  //принято байт
+    out >> data.sendBytes; //передано байт
+    out >> data.revPck;    //принто пакетов
+    out >> data.sendPck;   //передано пакетов
+    out >> data.workTime;  //Время работы сервера секунд
+    out >> data.clients;   //Количество подключенных клиентов
+
+    return out;
+}
 
 /*
  * Поскольку мы являемся клиентом, инициализацию сокета
@@ -34,7 +44,11 @@ QDataStream &operator <<(QDataStream &in, ServiceHeader &data){
 */
 TCPclient::TCPclient(QObject *parent) : QObject(parent)
 {
-
+    socket = new QTcpSocket(this);
+    connect(socket, &QTcpSocket::readyRead, this, &TCPclient::ReadyReed);
+    connect(socket, &QTcpSocket::connected, this, [&]{emit sig_connectStatus(STATUS_SUCCES);});
+    connect(socket, &QTcpSocket::errorOccurred, this, [&]{emit sig_connectStatus(ERR_CONNECT_TO_HOST);});
+    connect(socket, &QTcpSocket::disconnected, this, &TCPclient::sig_Disconnected);
 }
 
 /* write
@@ -43,8 +57,10 @@ TCPclient::TCPclient(QObject *parent) : QObject(parent)
 */
 void TCPclient::SendRequest(ServiceHeader head)
 {
-
-
+    QByteArray request;
+    QDataStream out_stream (&request, QIODevice::WriteOnly);
+    out_stream << head;
+    socket->write(request);
 }
 
 /* write
@@ -52,8 +68,10 @@ void TCPclient::SendRequest(ServiceHeader head)
 */
 void TCPclient::SendData(ServiceHeader head, QString str)
 {
-
-
+    QByteArray data;
+    QDataStream out_stream (&data, QIODevice::WriteOnly);
+    out_stream << head; out_stream << str;
+    socket->write(data);
 }
 
 /*
@@ -61,14 +79,14 @@ void TCPclient::SendData(ServiceHeader head, QString str)
  */
 void TCPclient::ConnectToHost(QHostAddress host, uint16_t port)
 {
-
+    socket->connectToHost(host, port);
 }
 /*
  * \brief Метод отключения от сервера
  */
 void TCPclient::DisconnectFromHost()
 {
-
+    socket->disconnectFromHost();
 }
 
 
@@ -139,12 +157,22 @@ void TCPclient::ReadyReed()
 
 void TCPclient::ProcessingData(ServiceHeader header, QDataStream &stream)
 {
-
     switch (header.idData){
-
         case GET_TIME:
-        case GET_SIZE:
+        {
+            QDateTime time;
+            stream >> time;
+            emit sig_sendTime(time);
+            break;
+        }
         case GET_STAT:
+        {
+            StatServer server_response;
+            stream >> server_response;
+            emit sig_sendStat(server_response);
+            break;
+        }
+        case GET_SIZE:
         case SET_DATA:
         case CLEAR_DATA:
         default:

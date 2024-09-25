@@ -31,6 +31,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     });
 
+    connect(client, &TCPclient::sig_connectStatus, this, &MainWindow::DisplayConnectStatus);
+
+    connect(client, &TCPclient::sig_sendTime, this, &MainWindow::DisplayTime);
+    connect(client, &TCPclient::sig_sendStat, this, &MainWindow::DisplayStat);
+
+    // connect(client, &TCPclient::sig_sendFreeSize, this, );
 
 
  /*
@@ -50,7 +56,7 @@ MainWindow::~MainWindow()
  */
 void MainWindow::DisplayTime(QDateTime time)
 {
-
+    ui->tb_result->append("Server time: " + time.toString());
 }
 void MainWindow::DisplayFreeSpace(uint32_t freeSpace)
 {
@@ -62,15 +68,20 @@ void MainWindow::SetDataReply(QString replyString)
 }
 void MainWindow::DisplayStat(StatServer stat)
 {
-
+    ui->tb_result->append("Статистика сервера:");
+    ui->tb_result->append("Принято: " + QString::number(stat.incBytes) + " bytes");
+    ui->tb_result->append("Передано: " + QString::number(stat.sendBytes) + " bytes");
+    ui->tb_result->append("Принято пакетов: " + QString::number(stat.revPck));
+    ui->tb_result->append("Передано пакетов: " + QString::number(stat.sendPck));
+    ui->tb_result->append("Время работы сервера: " + QString::number(stat.workTime) + " секунд");
+    ui->tb_result->append("Количество подключенных клиентов: " + QString::number(stat.clients));
 }
 void MainWindow::DisplayError(uint16_t error)
 {
     switch (error) {
-    case ERR_NO_FREE_SPACE:
-    case ERR_NO_FUNCT:
-    default:
-        break;
+    case ERR_NO_FREE_SPACE: ui->tb_result->append("Недостаточно свободной памяти на сервере"); break;
+    case ERR_NO_FUNCT: ui->tb_result->append("Нет реализации функционала");
+    default: break;
     }
 }
 /*!
@@ -149,23 +160,22 @@ void MainWindow::on_pb_request_clicked()
    header.status = STATUS_SUCCES;
    header.len = 0;
 
-   switch (ui->cb_request->currentIndex()){
-
-       //Получить время
-       case 0:
-       //Получить свободное место
-       case 1:
-       //Получить статистику
-       case 2:
-       //Отправить данные
-       case 3:
-       //Очистить память на сервере
-       case 4:
-       default:
-       ui->tb_result->append("Такой запрос не реализован в текущей версии");
-       return;
-
-   }
+    switch (ui->cb_request->currentIndex()){
+    //Получить время
+    case 0: header.idData = GET_TIME; break;
+    //Получить статистику
+    case 2:
+        header.idData = GET_STAT; break;
+    //Получить свободное место
+    case 1:
+    //Отправить данные
+    case 3:
+    //Очистить память на сервере
+    case 4:
+    default:
+        ui->tb_result->append("Такой запрос не реализован в текущей версии");
+        return;
+    }
 
    client->SendRequest(header);
 
