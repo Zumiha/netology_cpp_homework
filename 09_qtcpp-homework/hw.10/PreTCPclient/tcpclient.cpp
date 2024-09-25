@@ -157,24 +157,32 @@ void TCPclient::ReadyReed()
 
 void TCPclient::ProcessingData(ServiceHeader header, QDataStream &stream)
 {
-    switch (header.idData){
-        case GET_TIME:
-        {
+    switch (header.idData) {
+        case GET_TIME: {
             QDateTime time;
             stream >> time;
             emit sig_sendTime(time);
             break;
         }
-        case GET_STAT:
-        {
+        case GET_STAT: {
             StatServer server_response;
             stream >> server_response;
             emit sig_sendStat(server_response);
             break;
         }
-        case GET_SIZE:
-        case SET_DATA:
-        case CLEAR_DATA:
+        case GET_SIZE: {
+            uint32_t free_space;
+            stream >> free_space;
+            emit sig_sendFreeSize(free_space);
+            break;
+        }
+        case SET_DATA: {
+            QString server_response;
+            stream >> server_response;
+            emit sig_SendReplyForSetData(server_response);
+            break;
+        }
+        case CLEAR_DATA: emit sig_Success(header.idData);
         default:
             return;
 

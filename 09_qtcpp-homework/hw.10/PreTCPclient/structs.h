@@ -13,11 +13,11 @@
 
 
 enum Messages {
-    GET_TIME   = 100,
-    GET_SIZE   = 101,
-    GET_STAT   = 102,
-    SET_DATA   = 200,
-    CLEAR_DATA = 201
+    GET_TIME   = 100, //QDateTime
+    GET_SIZE   = 101, //uint32_t
+    GET_STAT   = 102, //см struct StatServer
+    SET_DATA   = 200, //QString
+    CLEAR_DATA = 201  //Ответ заголовком со статусом 1
 };
 
 enum StatusMessages {

@@ -35,9 +35,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(client, &TCPclient::sig_sendTime, this, &MainWindow::DisplayTime);
     connect(client, &TCPclient::sig_sendStat, this, &MainWindow::DisplayStat);
-
-    // connect(client, &TCPclient::sig_sendFreeSize, this, );
-
+    connect(client, &TCPclient::sig_sendFreeSize, this, &MainWindow::DisplayFreeSpace);
+    connect(client, &TCPclient::sig_SendReplyForSetData, this, &MainWindow::SetDataReply);
+    connect(client, &TCPclient::sig_Success, this, &MainWindow::DisplaySuccess);
 
  /*
   * Соединяем сигналы со слотами
@@ -60,11 +60,11 @@ void MainWindow::DisplayTime(QDateTime time)
 }
 void MainWindow::DisplayFreeSpace(uint32_t freeSpace)
 {
-
+    ui->tb_result->append("Server free space: " +  QString::number(freeSpace));
 }
 void MainWindow::SetDataReply(QString replyString)
 {
-
+    ui->tb_result->append("Server response: " + replyString);
 }
 void MainWindow::DisplayStat(StatServer stat)
 {
@@ -91,7 +91,11 @@ void MainWindow::DisplayError(uint16_t error)
 void MainWindow::DisplaySuccess(uint16_t typeMess)
 {
     switch (typeMess) {
-    case CLEAR_DATA:
+    case CLEAR_DATA: {
+        ui->tb_result->append("============================");
+        ui->tb_result->append("Место на сервере освобождено");
+        ui->tb_result->append("============================");
+    }
     default:
         break;
     }
@@ -103,13 +107,9 @@ void MainWindow::DisplaySuccess(uint16_t typeMess)
  */
 void MainWindow::DisplayConnectStatus(uint16_t status)
 {
-
     if(status == ERR_CONNECT_TO_HOST){
-
         ui->tb_result->append("Ошибка подключения к порту: " + QString::number(ui->spB_port->value()));
-
-    }
-    else{
+    } else {
         ui->lb_connectStatus->setText("Подключено");
         ui->lb_connectStatus->setStyleSheet("color: green");
         ui->pb_connect->setText("Отключиться");
@@ -153,32 +153,37 @@ void MainWindow::on_pb_connect_clicked()
 */
 void MainWindow::on_pb_request_clicked()
 {
+    ServiceHeader header;
 
-   ServiceHeader header;
+    header.id = ID;
+    header.status = STATUS_SUCCES;
+    header.len = 0;
 
-   header.id = ID;
-   header.status = STATUS_SUCCES;
-   header.len = 0;
+    auto index = ui->cb_request->currentIndex();
 
-    switch (ui->cb_request->currentIndex()){
+    switch (index){
     //Получить время
     case 0: header.idData = GET_TIME; break;
-    //Получить статистику
-    case 2:
-        header.idData = GET_STAT; break;
     //Получить свободное место
-    case 1:
+    case 1: header.idData = GET_SIZE; break;
+    //Получить статистику
+    case 2: header.idData = GET_STAT; break;
     //Отправить данные
-    case 3:
+    case 3: header.idData = SET_DATA; break;
     //Очистить память на сервере
-    case 4:
+    case 4: header.idData = CLEAR_DATA; break;
     default:
         ui->tb_result->append("Такой запрос не реализован в текущей версии");
         return;
     }
 
-   client->SendRequest(header);
-
+    switch (index) {
+    case 3: {
+        client->SendData(header, ui->le_data->text());
+        break;
+    }
+    default: client->SendRequest(header);
+    }
 }
 
 /*!
@@ -191,6 +196,7 @@ void MainWindow::on_cb_request_currentIndexChanged(int index)
         ui->le_data->setEnabled(true);
     }
     else{
+        ui->le_data->clear();
         ui->le_data->setEnabled(false);
     }
 }
