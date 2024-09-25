@@ -70,7 +70,8 @@ void TCPclient::SendData(ServiceHeader head, QString str)
 {
     QByteArray data;
     QDataStream out_stream (&data, QIODevice::WriteOnly);
-    out_stream << head; out_stream << str;
+    out_stream << head;
+    out_stream << str;
     socket->write(data);
 }
 
