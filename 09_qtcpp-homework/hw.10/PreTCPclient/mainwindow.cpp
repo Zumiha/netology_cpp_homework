@@ -39,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(client, &TCPclient::sig_SendReplyForSetData, this, &MainWindow::SetDataReply);
     connect(client, &TCPclient::sig_Success, this, &MainWindow::DisplaySuccess);
 
+    connect(client, &TCPclient::sig_Error, this, &MainWindow::DisplayError);
+
  /*
   * Соединяем сигналы со слотами
  */
@@ -169,7 +171,12 @@ void MainWindow::on_pb_request_clicked()
     //Получить статистику
     case 2: header.idData = GET_STAT; break;
     //Отправить данные
-    case 3: header.idData = SET_DATA; break;
+    case 3: {
+        header.idData = SET_DATA;
+        auto text = ui->le_data->text();
+        header.len = text.length();
+        break;
+    }
     //Очистить память на сервере
     case 4: header.idData = CLEAR_DATA; break;
     default:
