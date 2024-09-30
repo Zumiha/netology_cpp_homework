@@ -1,0 +1,112 @@
+#define BLUE 11
+#define GREEN 12
+#define RED 13
+#define BUTTON 2
+
+#define BLUE_DOWN 2  
+#define BLUE_UP 3    
+#define GREEN_DOWN 4 
+#define GREEN_UP 5  
+#define RED_DOWN 6    
+#define RED_UP 7      
+
+#define STEP 50
+
+int blue_powr = 250;  
+int green_powr = 250; 
+int red_powr = 250;   
+
+int blue_down_last = LOW;
+int blue_up_last = LOW;
+int green_down_last = LOW;
+int green_up_last = LOW;
+int red_down_last = LOW;
+int red_up_last = LOW;
+
+
+void debounce2 (int button, int& color_powr1, int& color_powr2, int& last_button_state)  {
+  int current = digitalRead(button);
+  if(last_button_state != current) {
+    delay(10);
+    current = digitalRead(button);
+  }
+  if (last_button_state == HIGH && current == LOW) {
+    switch(button) {
+      case BLUE_DOWN:
+      case GREEN_DOWN:
+      case RED_DOWN:
+        color_powr1 = constrain(color_powr1 + STEP, 0, 250); break;
+        color_powr2 = constrain(color_powr2 + STEP, 0, 250); break;
+      default:
+        color_powr1 = constrain(color_powr1 - STEP, 0, 250); break;
+        color_powr2 = constrain(color_powr2 - STEP, 0, 250); break;
+    }
+  }
+  last_button_state = current;
+}
+
+void debounce1 (int button, int& color_powr1, int& last_button_state)  {
+  int current = digitalRead(button);
+  if(last_button_state != current) {
+    delay(10);
+    current = digitalRead(button);
+  }
+
+  if (last_button_state == HIGH && current == LOW) {
+    switch(button) {
+      case BLUE_DOWN:
+      case GREEN_DOWN:
+      case RED_DOWN:
+        color_powr1 = constrain(color_powr1 + STEP, 0, 250); break;
+      default:
+        color_powr1 = constrain(color_powr1 - STEP, 0, 250); break;
+    }
+  }
+  last_button_state = current;
+}
+
+void setup()
+{
+  pinMode(BLUE, OUTPUT);
+  pinMode(GREEN, OUTPUT);
+  pinMode(RED, OUTPUT);
+
+  pinMode(BLUE_DOWN, INPUT_PULLUP);
+  pinMode(BLUE_UP, INPUT_PULLUP);
+  pinMode(GREEN_DOWN, INPUT_PULLUP);
+  pinMode(GREEN_UP, INPUT_PULLUP);
+  pinMode(RED_DOWN, INPUT_PULLUP);
+  pinMode(RED_UP, INPUT_PULLUP);
+  
+  pinMode(BUTTON, INPUT);
+  digitalWrite(BUTTON, HIGH);
+
+  digitalWrite(BLUE, LOW);
+  digitalWrite(GREEN, LOW);
+  digitalWrite(RED, LOW);
+}
+
+void loop() {
+  // debounce2(BLUE_DOWN, green_powr, red_powr, blue_down_last);
+  // debounce2(BLUE_UP, green_powr, red_powr, blue_up_last);
+  
+  // debounce2(GREEN_DOWN, red_powr, blue_powr, green_down_last);
+  // debounce2(GREEN_UP, red_powr, blue_powr, green_up_last);
+
+  // debounce2(RED_DOWN, green_powr, blue_powr, red_down_last);
+  // debounce2(RED_UP, green_powr, blue_powr, red_up_last);
+
+  debounce1(BLUE_DOWN, blue_powr, blue_down_last);
+  debounce1(BLUE_UP, blue_powr, blue_up_last);
+
+  debounce1(GREEN_DOWN, green_powr, green_down_last);
+  debounce1(GREEN_UP, green_powr, green_up_last);
+
+  debounce1(RED_DOWN, red_powr, red_down_last);
+  debounce1(RED_UP, red_powr, red_up_last);
+
+  analogWrite(BLUE, blue_powr);
+  analogWrite(GREEN, green_powr);
+  analogWrite(RED, red_powr);
+
+}
