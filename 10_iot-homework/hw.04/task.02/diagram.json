@@ -1,0 +1,143 @@
+{
+  "version": 1,
+  "author": "mk marsh",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 192.6, "left": 22, "attrs": {} },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 33.6,
+      "left": 191.45,
+      "rotate": 90,
+      "attrs": { "value": "300" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": 33.6,
+      "left": 172.25,
+      "rotate": 90,
+      "attrs": { "value": "300" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": 33.6,
+      "left": 153.05,
+      "rotate": 90,
+      "attrs": { "value": "300" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r4",
+      "top": 33.6,
+      "left": 133.85,
+      "rotate": 90,
+      "attrs": { "value": "300" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r5",
+      "top": 33.6,
+      "left": 114.65,
+      "rotate": 90,
+      "attrs": { "value": "300" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r6",
+      "top": 33.6,
+      "left": 95.45,
+      "rotate": 90,
+      "attrs": { "value": "300" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r7",
+      "top": 33.6,
+      "left": 76.25,
+      "rotate": 90,
+      "attrs": { "value": "300" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r8",
+      "top": 33.6,
+      "left": 57.05,
+      "rotate": 90,
+      "attrs": { "value": "300" }
+    },
+    {
+      "type": "wokwi-7segment",
+      "id": "sevseg1",
+      "top": -176.58,
+      "left": 58.72,
+      "attrs": { "digits": "4", "common": "cathode" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 297.5,
+      "left": 349.1,
+      "rotate": 90,
+      "attrs": { "color": "green", "key": "1" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn2",
+      "top": 297.5,
+      "left": 406.7,
+      "rotate": 90,
+      "attrs": { "color": "red", "key": "2" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r9",
+      "top": 244.8,
+      "left": 364.25,
+      "rotate": 90,
+      "attrs": { "value": "10000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r10",
+      "top": 244.8,
+      "left": 421.85,
+      "rotate": 90,
+      "attrs": { "value": "10000" }
+    }
+  ],
+  "connections": [
+    [ "sevseg1:DIG1", "uno:2", "green", [ "v-28.8", "h192.01", "v364.8", "h-58.3" ] ],
+    [ "sevseg1:DIG2", "uno:3", "green", [ "v-19.2", "h153.6", "v345.6", "h-57.6" ] ],
+    [ "sevseg1:DIG3", "uno:4", "green", [ "v-9.6", "h134.4", "v326.4", "h-58.1" ] ],
+    [ "sevseg1:DIG4", "uno:5", "green", [ "v8.76", "h115.2", "v230.4", "h-57.6" ] ],
+    [ "sevseg1:A", "r1:1", "green", [ "v-38.4", "h-86.4", "v144", "h172.8" ] ],
+    [ "sevseg1:B", "r2:1", "green", [ "v-48", "h-134.4", "v163.2", "h163.2" ] ],
+    [ "sevseg1:C", "r3:1", "green", [ "v56.76", "h28.8" ] ],
+    [ "sevseg1:D", "r4:1", "green", [ "v66.36", "h28.8" ] ],
+    [ "sevseg1:E", "r5:1", "green", [ "v75.96", "h19.21" ] ],
+    [ "sevseg1:F", "r6:1", "green", [ "v-57.6", "h-115.2", "v182.4", "h86.4", "v28.8", "h9.6" ] ],
+    [ "sevseg1:G", "r7:1", "green", [ "v8.76", "h-57.6" ] ],
+    [ "sevseg1:DP", "r8:1", "green", [ "v18.36", "h-57.6" ] ],
+    [ "r1:2", "uno:6", "green", [ "h0" ] ],
+    [ "r2:2", "uno:7", "green", [ "h0", "v46.8", "h9.6" ] ],
+    [ "r3:2", "uno:8", "green", [ "h0", "v37.2", "h9.6" ] ],
+    [ "r4:2", "uno:9", "green", [ "h0", "v46.8", "h19.2" ] ],
+    [ "r5:2", "uno:10", "green", [ "h0", "v56.4", "h28.8" ] ],
+    [ "r6:2", "uno:11", "green", [ "h0", "v66", "h38.4" ] ],
+    [ "r7:2", "uno:12", "green", [ "h0", "v75.6", "h57.6" ] ],
+    [ "r8:2", "uno:13", "green", [ "h0", "v85.2", "h57.6" ] ],
+    [ "uno:GND.1", "sevseg1:COM", "black", [ "v-38.4", "h-137.5", "v-240", "h182.4" ] ],
+    [ "uno:GND.2", "btn1:2.r", "black", [ "v28.7", "h182.9" ] ],
+    [ "uno:GND.2", "btn2:2.r", "black", [ "v28.7", "h240.5" ] ],
+    [ "btn1:1.r", "uno:A0", "green", [ "v77", "h-163.2" ] ],
+    [ "btn2:1.r", "uno:A1", "green", [ "v67.4", "h-211.2" ] ],
+    [ "uno:5V", "r10:1", "red", [ "v57.5", "h154", "v-259.2", "h115.2" ] ],
+    [ "uno:5V", "r9:1", "red", [ "v57.5", "h154", "v-259.2", "h57.6" ] ],
+    [ "btn2:1.l", "r10:2", "green", [ "v0" ] ],
+    [ "btn1:1.l", "r9:2", "green", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
