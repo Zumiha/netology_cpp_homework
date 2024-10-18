@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "author": "Uri Shaked",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 200, "left": 20, "attrs": {} },
+    { "type": "wokwi-lcd1602", "id": "lcd", "top": 13.03, "left": -32, "attrs": {} },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 152.95,
+      "left": 153.6,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-analog-joystick",
+      "id": "joystick1",
+      "top": 239.4,
+      "left": 370.2,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [ "uno:GND.1", "lcd:VSS", "black", [ "v-51", "h-135.5", "v-14" ] ],
+    [ "uno:GND.1", "lcd:K", "black", [ "v-45.8", "h8.5" ] ],
+    [ "uno:GND.1", "lcd:RW", "black", [ "v-51", "*", "h0", "v18" ] ],
+    [ "uno:5V", "lcd:VDD", "red", [ "v16", "h-16" ] ],
+    [ "uno:5V", "r1:2", "red", [ "v16", "h-170.4", "v-238.3", "h211.2", "v-15.6" ] ],
+    [ "r1:1", "lcd:A", "pink", [] ],
+    [ "uno:12", "lcd:RS", "blue", [ "v-16", "*", "h0", "v20" ] ],
+    [ "uno:11", "lcd:E", "purple", [ "v-20", "*", "h0", "v20" ] ],
+    [ "uno:10", "lcd:D4", "green", [ "v-24", "*", "h0", "v20" ] ],
+    [ "uno:9", "lcd:D5", "brown", [ "v-28", "*", "h0", "v20" ] ],
+    [ "uno:8", "lcd:D6", "gold", [ "v-32", "*", "h0", "v20" ] ],
+    [ "uno:7", "lcd:D7", "gray", [ "v-36", "*", "h0", "v20" ] ],
+    [ "uno:5V", "joystick1:VCC", "red", [ "v50.1", "h223.2", "v-96" ] ],
+    [ "uno:GND.2", "joystick1:GND", "black", [ "v40.5", "h252.1" ] ],
+    [ "joystick1:VERT", "uno:A1", "green", [ "v67.2", "h-172.8" ] ],
+    [ "joystick1:HORZ", "uno:A0", "green", [ "v57.6", "h-192" ] ],
+    [ "joystick1:SEL", "uno:6", "green", [ "v48", "h-134.4", "v-211.2", "h-76.8" ] ]
+  ],
+  "dependencies": {}
+}
