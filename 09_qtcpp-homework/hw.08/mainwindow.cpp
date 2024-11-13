@@ -77,17 +77,15 @@ void MainWindow::on_act_connect_triggered()
      * отключаемся
     */
 
-    if(ui->lb_statusConnect->text() == "Отключено"){
-
+    if(ui->lb_statusConnect->text() == "Отключено") {
        ui->lb_statusConnect->setText("Подключение");
        ui->lb_statusConnect->setStyleSheet("color : black");
 
 
        auto conn = [&]{dataBase->ConnectToDataBase(dataForConnect);};
        QtConcurrent::run(conn);
-
     }
-    else{
+    else {
         dataBase->DisconnectFromDataBase(DB_NAME);
         ui->lb_statusConnect->setText("Отключено");
         ui->act_connect->setText("Подключиться");
