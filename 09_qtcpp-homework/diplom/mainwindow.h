@@ -5,6 +5,7 @@
 #include <QtWidgets>
 #include <QtConcurrent>
 
+#include <windows.h>
 #include "dbdata.h"
 
 QT_BEGIN_NAMESPACE
@@ -37,6 +38,8 @@ private:
 
     void createActions();
     void createMenu();
+
+    void startUpConnect();
 
     QMenu *connectMenu;
     QAction *act_addData;

@@ -86,3 +86,7 @@ void DbData::checkSettingsFile() {
     QDir::setCurrent(QCoreApplication::applicationDirPath());
 }
 
+void DbData::sendData() {
+    this->checkSettingsFile();
+    this->on_buttonBox_accepted();
+}

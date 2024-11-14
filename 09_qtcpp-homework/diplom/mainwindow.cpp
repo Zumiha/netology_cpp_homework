@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->statusbar->setStyleSheet("color: default");
     ui->statusbar->setStyleSheet("QStatusBar::item {border: None;}");
+    ui->cb_airports->setMaxVisibleItems(7);
 
     conn_info = new QLabel(tr("Статус  -"));
     connection_status = new QLabel(tr("Отключено"));
@@ -17,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     createActions();
     createMenu();
+
 
     dataDb = new DbData(this);
     dataBase = new DataBase(this);
@@ -30,6 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
     dataBase->AddDataBase(POSTGRE_DRIVER, DB_NAME);
     connect(dataBase, &DataBase::sig_SendStatusConnection, this, &MainWindow::ReceiveStatusConnectionToDB);
     connect(dataBase, &DataBase::sig_SendStatusRequest, this, &MainWindow::ReceiveStatusRequestToDB);
+
+    // startUpConnect(); //запуск подключения к БД после старта программы
 }
 
 MainWindow::~MainWindow()
@@ -37,6 +41,7 @@ MainWindow::~MainWindow()
     delete ui;
     delete dataDb;
     delete dataBase;
+    delete msg;
 }
 
 void MainWindow::createActions() {
@@ -99,5 +104,17 @@ void MainWindow::ReceiveStatusRequestToDB(QSqlError err) {
         msg->setText(err.text());
         msg->exec();
     }
-    //else{dataBase->ReadAnswerFromDB(ui->cb_category->currentIndex());} //currentIndex это выпадающее меню выбора
+    //else{dataBase->ReadAnswerFromDB(ui->cb_airports->currentIndex());} //currentIndex это выпадающее меню выбора
 }
+
+void MainWindow::startUpConnect() {
+    dataDb->sendData(); //эмуляция отправки данных соединения с БД в mainwindow
+    do {
+        act_connectTo(); //эмуляция срабатывания действия "подключиться" из меню окна
+        if (connection_status->text() == "Подключено к БД") {
+            dataDb->hide();
+            break;
+        }
+    } while (true);
+}
+

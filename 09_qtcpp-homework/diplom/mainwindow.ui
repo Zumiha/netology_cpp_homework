@@ -23,34 +23,6 @@
       <property name="bottomMargin">
        <number>5</number>
       </property>
-      <item row="0" column="0">
-       <widget class="QComboBox" name="comboBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>50</height>
-         </size>
-        </property>
-        <item>
-         <property name="text">
-          <string>Airport1</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Airport2</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Airport3</string>
-         </property>
-        </item>
-       </widget>
-      </item>
       <item row="1" column="0">
        <spacer name="verticalSpacer">
         <property name="orientation">
@@ -63,6 +35,19 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="0" column="0">
+       <widget class="QComboBox" name="cb_airports">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>50</height>
+         </size>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

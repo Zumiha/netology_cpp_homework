@@ -19,6 +19,7 @@ class DbData : public QDialog
 public:
     explicit DbData(QWidget *parent = nullptr);
     ~DbData();
+    void sendData();
 
 
 signals:
