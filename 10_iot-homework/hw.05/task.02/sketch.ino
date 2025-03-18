@@ -16,6 +16,13 @@ float distance_meters;
 int cross_pos_X = 0; int cross_pos_Y = 1;
 unsigned int timer_ut = 0, timer_lcd = 0, timer_led = 0;
 
+enum Colors {
+  off,
+  grn,
+  ylw,
+  rd
+};
+
 void ReadUltrasonicDistance() {  
   if (millis() - timer_ut >= DELAY_ULTRASONIC) {
 
@@ -57,36 +64,55 @@ void updateLCD() {
   }
 }
 
-void SetLEDColor(int r, int g, int b) {
-  analogWrite(RED, r);
-  analogWrite(GREEN, g);
-  analogWrite(BLUE, b);
+void SetLEDColor(int x) {
+  switch(x) {
+    case off: 
+      analogWrite(RED, 255);
+      analogWrite(GREEN, 255);
+      analogWrite(BLUE, 255);
+      break;
+    case rd: 
+      analogWrite(RED, 0);
+      analogWrite(GREEN, 255);
+      analogWrite(BLUE, 255);
+      break;
+    case ylw: 
+      analogWrite(RED, 0);
+      analogWrite(GREEN, 0);
+      analogWrite(BLUE, 255);
+      break;
+    case grn: 
+      analogWrite(RED, 255);
+      analogWrite(GREEN, 0);
+      analogWrite(BLUE, 255);
+      break; 
+  }
 }
 
 void updateLED() {
   if (distance_meters < 1.0) {
     if (millis() - timer_led >= 150) {
-      SetLEDColor(0, 255, 255); // Red
+      SetLEDColor(rd); // Red
       delay(distance_meters*150);
-      SetLEDColor(255, 255, 255); 
+      SetLEDColor(off); 
       timer_led = millis();
     }
   } else if (distance_meters >= 1.0 && distance_meters < 3.0) {
-    if (millis() - timer_led >= 150) {
-      SetLEDColor(0, 0, 255); // Yellow
+    if (millis() - timer_led >= 150) {  
+      SetLEDColor(ylw); // Yellow
       delay(distance_meters*150);
-      SetLEDColor(255, 255, 255);
+      SetLEDColor(off); 
       timer_led = millis();
     }
   } else if (distance_meters >= 3.0) {
     if (millis() - timer_led >= 300) {
-      SetLEDColor(255, 0, 255); // Green
-      delay(300);
-      SetLEDColor(255, 255, 255);
+      SetLEDColor(grn); // Green
+      delay(distance_meters*150);
+      SetLEDColor(off); 
       timer_led = millis();
     }
   } else {
-    SetLEDColor(255, 255, 255);
+    SetLEDColor(off);
   }
 }
 
