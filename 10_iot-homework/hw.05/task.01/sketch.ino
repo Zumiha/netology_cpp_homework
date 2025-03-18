@@ -77,13 +77,15 @@
 
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print("Mx:");
-    lcd.print(maxTemp, 1);
-    lcd.print(" Mn:");
-    lcd.print(minTemp, 1);
-
+    lcd.print("Max:  Min:  Avg:");
+    
     lcd.setCursor(0, 1);
-    lcd.print("Avg:");
+    lcd.print(maxTemp, 1);
+
+    lcd.setCursor(5, 1);
+    lcd.print(minTemp, 1);
+    
+    lcd.setCursor(11, 1);
     lcd.print(avgTemp, 1);
 
     delay(100);
