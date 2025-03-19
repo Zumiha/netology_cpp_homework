@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "author": "mk marsh",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 96.6, "left": -144.6, "attrs": {} },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd1",
+      "top": -99.2,
+      "left": -148,
+      "attrs": { "pins": "i2c" }
+    },
+    { "type": "wokwi-analog-joystick", "id": "joystick1", "top": -87, "left": 168.6, "attrs": {} },
+    {
+      "type": "wokwi-pir-motion-sensor",
+      "id": "pir1",
+      "top": 384,
+      "left": -122.02,
+      "rotate": 180,
+      "delayTime": 2, 
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 404.8,
+      "left": -207,
+      "rotate": 180,
+      "attrs": { "color": "red" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 368.2,
+      "left": -221.65,
+      "rotate": 270,
+      "attrs": { "value": "300000" }
+    }
+  ],
+  "connections": [
+    [ "uno:GND.1", "lcd1:GND", "black", [ "v-12.6", "h-129.5", "v-163.2" ] ],
+    [ "lcd1:VCC", "uno:5V", "red", [ "h-19.2", "v360", "h178.6" ] ],
+    [ "lcd1:SDA", "uno:A4", "green", [ "h-24.8", "v355.5", "h274.2" ] ],
+    [ "lcd1:SCL", "uno:A5", "green", [ "h-29.6", "v351.5", "h312.5" ] ],
+    [ "pir1:GND", "uno:GND.2", "black", [ "v-67.2", "h115.46" ] ],
+    [ "joystick1:GND", "uno:GND.3", "black", [ "v288", "h-211.2" ] ],
+    [ "uno:5V", "joystick1:VCC", "red", [ "v12.1", "h186.2" ] ],
+    [ "uno:A0", "joystick1:VERT", "green", [ "v15.1", "h147.8" ] ],
+    [ "pir1:VCC", "uno:5V", "red", [ "v-57.6", "h76.8" ] ],
+    [ "pir1:OUT", "uno:2", "green", [ "v-62", "h212.94", "v-230.6", "h-50.1" ] ],
+    [ "uno:GND.1", "led1:C", "black", [ "v-19.2", "h-153.3", "v316.8" ] ],
+    [ "led1:A", "r1:1", "green", [ "v0" ] ],
+    [ "r1:2", "uno:13", "green", [ "v-264.6", "h172.4" ] ]
+  ],
+  "dependencies": {}
+}
