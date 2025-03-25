@@ -1,5 +1,5 @@
 # Домашнее задание по теме "‎Управление силовой нагрузкой"
-Решения домашнего задания hw.06 выполненные в [<img src="wokwi_logo.svg" alt="Wokwi" height="20"> Wokwi Online Arduino Simulator](https://wokwi.com/).
+Решения домашнего задания hw.07 выполненные в [<img src="wokwi_logo.svg" alt="Wokwi" height="20"> Wokwi Online Arduino Simulator](https://wokwi.com/).
 
 ### Задача №1. Управление направлением и скоростью вращения шагового двигателя без драйвера
 -  [sketch.ino](task.01/sketch.ino)
