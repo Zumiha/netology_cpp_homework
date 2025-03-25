@@ -23,6 +23,10 @@ int16_t ac_reading[coord][buffer_size];
 int16_t gyro_reading[coord][buffer_size];
 int buffer_step = 0;
 
+String axis_name[] = {"oX:", "oY:", "oZ:"};
+float accelAxis[coord];
+float gyroAxis[coord];
+
 float filterReading(int16_t readings[coord][buffer_size], int num) {
   float sum = 0;
   for (int i = 0; i < buffer_size; i++) {
@@ -36,6 +40,17 @@ void clearLCDrow(int row) {
   for (int i = 0; i < LCDWIDTH; i++) {
     lcd.print(" ");
   }
+}
+
+void displayRow (int axis) {
+  int row = axis + 1;
+  clearLCDrow(row);
+  lcd.setCursor(0, row);
+  lcd.print(axis_name[axis]);
+  lcd.setCursor(5, row);
+  lcd.print(accelAxis[axis], 2); lcd.print(" g"); 
+  lcd.setCursor(14, row);
+  lcd.print(gyroAxis[axis], 0); lcd.print(deg);  
 }
 
 void setup() {
@@ -60,6 +75,7 @@ void setup() {
   lcd.print("Rotate:");
 }
 
+
 void loop() {
   // put your main code here, to run repeatedly:
   ac_reading[0][buffer_step] = abs(mpu1.getAccelerationX() - mpu2.getAccelerationX());
@@ -72,37 +88,10 @@ void loop() {
 
   buffer_step = (buffer_step + 1) % 10;
 
-  float accelAxis1 = filterReading(ac_reading, 0)/32768*2;
-  float accelAxis2 = filterReading(ac_reading, 1)/32768*2;
-  float accelAxis3 = filterReading(ac_reading, 2)/32768*2;
-
-  float gyroAxis1 = filterReading(gyro_reading, 0)/32768*250;
-  float gyroAxis2 = filterReading(gyro_reading, 1)/32768*250;
-  float gyroAxis3 = filterReading(gyro_reading, 2)/32768*250;
-
-  clearLCDrow(1);
-  lcd.setCursor(0, 1);
-  lcd.print("oX:");
-  lcd.setCursor(5, 1);
-  lcd.print(accelAxis1, 2); lcd.print(" g"); 
-  lcd.setCursor(14, 1);
-  lcd.print(gyroAxis1, 0); lcd.print(deg); 
-
-  clearLCDrow(2);
-  lcd.setCursor(0, 2);
-  lcd.print("oY:");
-  lcd.setCursor(5, 2);
-  lcd.print(accelAxis2, 2); lcd.print(" g");  
-  lcd.setCursor(14, 2);
-  lcd.print(gyroAxis2, 0); lcd.print(deg); 
-
-  clearLCDrow(3);
-  lcd.setCursor(0, 3);
-  lcd.print("oZ:");
-  lcd.setCursor(5, 3);
-  lcd.print(accelAxis3, 2); lcd.print(" g"); 
-  lcd.setCursor(14, 3);
-  lcd.print(gyroAxis3, 0);  lcd.print(deg); 
-
+  for (int i = 0; i < coord; i++) {
+    accelAxis[i] = filterReading(ac_reading, i)/32768*2;
+    gyroAxis[i] = filterReading(gyro_reading, i)/32768*250;
+    displayRow(i);
+  }
   delay(100); 
 }
