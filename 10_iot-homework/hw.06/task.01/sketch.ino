@@ -50,6 +50,10 @@ void setup() {
   lcd.backlight();
   lcd.begin(LCDWIDTH, LCD_LINES);
   displayGreeting("MPU6050 Initilization");
+  delay(500);  
+
+  mpu.initialize();
+  Serial.println(mpu.testConnection() ? "MPU6050 OK" : "MPU6050 FAIL"); // состояние соединения
   delay(500);
 
   lcd.setCursor(0, 0);
