@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "author": "mk marsh",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": -28.2, "left": -19.8, "attrs": {} },
+    {
+      "type": "wokwi-mpu6050",
+      "id": "imu1",
+      "top": 79.78,
+      "left": 300.52,
+      "rotate": 270,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-lcd2004",
+      "id": "lcd1",
+      "top": -233.6,
+      "left": -4,
+      "attrs": { "pins": "i2c" }
+    },
+    {
+      "type": "wokwi-mpu6050",
+      "id": "imu2",
+      "top": 204.58,
+      "left": 300.52,
+      "rotate": 270,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [ "uno:GND.1", "lcd1:GND", "black", [ "v-12.6", "h-105.3", "v-169.8" ] ],
+    [ "lcd1:VCC", "uno:5V", "red", [ "h-19.2", "v388.1", "h159.4" ] ],
+    [ "uno:5V", "imu1:VCC", "red", [ "v33", "h119", "v-105.52" ] ],
+    [ "uno:GND.2", "imu1:GND", "black", [ "v28.7", "h115.1", "v-95.92" ] ],
+    [ "lcd1:SDA", "uno:A4.2", "green", [ "h-23.8", "v138.6", "h101" ] ],
+    [ "lcd1:SCL", "uno:A5.2", "green", [ "h-28.8", "v134.7", "h96" ] ],
+    [ "imu1:SCL", "uno:A5", "green", [ "h-48", "v76.72", "h-33.1" ] ],
+    [ "imu1:SDA", "uno:A4", "green", [ "h-43", "v72", "h-52.2" ] ],
+    [ "uno:5V", "imu2:VCC", "red", [ "v0" ] ],
+    [ "uno:GND.2", "imu2:GND", "black", [ "v0" ] ],
+    [ "uno:A5", "imu2:SCL", "green", [ "v0" ] ],
+    [ "uno:A4", "imu2:SDA", "green", [ "v0" ] ],
+    [ "imu2:VCC", "imu2:AD0", "red", [ "h-9.6", "v57.52" ] ]
+  ],
+  "dependencies": {}
+}
