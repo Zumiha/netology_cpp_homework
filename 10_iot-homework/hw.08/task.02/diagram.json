@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "author": "mk marsh",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": -28.2, "left": -19.8, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": -176.2,
+      "left": 259.2,
+      "attrs": { "color": "green", "xray": "1" }
+    },
+    { "type": "wokwi-gnd", "id": "gnd1", "top": -134.4, "left": 354.6, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn2",
+      "top": -99.4,
+      "left": 259.2,
+      "attrs": { "color": "red", "xray": "1" }
+    },
+    { "type": "wokwi-gnd", "id": "gnd2", "top": -57.6, "left": 354.6, "attrs": {} },
+    {
+      "type": "wokwi-stepper-motor",
+      "id": "stepper1",
+      "top": -351.59,
+      "left": 38.83,
+      "attrs": { "size": "17" }
+    },
+    {
+      "type": "wokwi-a4988",
+      "id": "drv1",
+      "top": -119.8,
+      "left": 91.6,
+      "rotate": 270,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [ "gnd1:GND", "btn1:2.r", "black", [ "v0" ] ],
+    [ "drv1:SLEEP", "drv1:RESET", "green", [ "v19.2", "h-9.6" ] ],
+    [ "stepper1:B-", "drv1:1B", "black", [ "v0" ] ],
+    [ "stepper1:B+", "drv1:1A", "green", [ "v0" ] ],
+    [ "stepper1:A+", "drv1:2A", "blue", [ "v0" ] ],
+    [ "stepper1:A-", "drv1:2B", "red", [ "v0" ] ],
+    [ "uno:8", "drv1:DIR", "green", [ "v0" ] ],
+    [ "uno:9", "drv1:STEP", "green", [ "v0" ] ],
+    [ "btn2:1.l", "uno:2", "green", [ "h0" ] ],
+    [ "btn1:1.l", "uno:3", "green", [ "h0" ] ],
+    [ "gnd2:GND", "btn2:2.r", "black", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
