@@ -11,4 +11,4 @@
 
 ### Задача №3. Формирование светового сигнала SOS по нажатию на кнопку
 -  [sketch.ino](task.02/sketch.ino)
--  [![Wokwi badge](wokwi_badge.svg)]( )
+-  [![Wokwi badge](wokwi_badge.svg)](https://wokwi.com/projects/427300444143214593)
