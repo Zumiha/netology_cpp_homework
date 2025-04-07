@@ -49,6 +49,16 @@ void lcdPrint(char* text, int& value)
   lcd.print(value); lcd.print(deg);
 }
 
+void lcdPrint(char* text1, char* text2)
+{
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(text1);
+  lcd.setCursor(0, 1);
+  lcd.print(" Value: ");
+  lcd.print(text2); lcd.print(deg);
+}
+
 void translateIR()
 {
   switch (receiver.decodedIRData.command) {
@@ -57,11 +67,13 @@ void translateIR()
       if (angle_input > 180) {
         inputCommands.reset_input();
         angle_input = inputCommands.valueServo();
-        lcdPrint("WRONG ANGLE", angle_input);
+        lcdPrint("WRONG ANGLE", "N/A");
+        inputCommands.reset_input();
       } else {
         lcdPrint("ACTUATE SERVO", angle_input);
         servo_motor.write(angle_input);
         delay(15);
+        inputCommands.reset_input();
       }
       break;
     case 176:
