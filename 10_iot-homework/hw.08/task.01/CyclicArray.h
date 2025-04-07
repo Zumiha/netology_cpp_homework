@@ -15,6 +15,10 @@ class CyclicArray {
     CyclicArray& operator=(const CyclicArray&) = delete;
 
     void push_back(int value) {
+	if (++next_index > capacity) {
+		this->reset_input();
+		++next_index;
+	}
     // Сдвигаем все элементы влево
     for(int i = 0; i < capacity - 1; ++i) {
         commands[i] = commands[i + 1];
