@@ -1,0 +1,245 @@
+{
+  "version": 1,
+  "author": "mk marsh",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": -66.6, "left": -10.2, "attrs": {} },
+    {
+      "type": "wokwi-led-bar-graph",
+      "id": "bargraph1",
+      "top": -350.2,
+      "left": 110.6,
+      "rotate": 270,
+      "attrs": { "color": "lime" }
+    },
+    {
+      "type": "wokwi-74hc595",
+      "id": "sr1",
+      "top": -146,
+      "left": 92.36,
+      "rotate": 180,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": -216,
+      "left": 76,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": -216,
+      "left": 86,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": -216,
+      "left": 95,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r4",
+      "top": -216,
+      "left": 105,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r5",
+      "top": -216,
+      "left": 115,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r6",
+      "top": -216,
+      "left": 124.25,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r7",
+      "top": -216,
+      "left": 133.85,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r8",
+      "top": -216,
+      "left": 143.45,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-led-bar-graph",
+      "id": "bargraph2",
+      "top": -350.2,
+      "left": 206.6,
+      "rotate": 270,
+      "attrs": { "color": "lime" }
+    },
+    {
+      "type": "wokwi-74hc595",
+      "id": "sr2",
+      "top": -146,
+      "left": 188.36,
+      "rotate": 180,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r9",
+      "top": -216,
+      "left": 172.25,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r10",
+      "top": -216,
+      "left": 181.85,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r11",
+      "top": -216,
+      "left": 191.45,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r12",
+      "top": -216,
+      "left": 201.05,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r13",
+      "top": -216,
+      "left": 210.65,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r14",
+      "top": -216,
+      "left": 220.25,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r15",
+      "top": -216,
+      "left": 229.85,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r16",
+      "top": -216,
+      "left": 239.45,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": -147.4,
+      "left": 374.4,
+      "attrs": { "color": "green", "xray": "1" }
+    },
+    { "type": "wokwi-gnd", "id": "gnd1", "top": -96, "left": 498.6, "attrs": {} }
+  ],
+  "connections": [
+    [ "sr1:MR", "sr1:VCC", "green", [ "v18", "h57.6" ] ],
+    [ "uno:13", "sr1:SHCP", "green", [ "v0" ] ],
+    [ "sr1:STCP", "uno:4", "green", [ "v37.2", "h82.5" ] ],
+    [ "uno:GND.1", "sr1:OE", "black", [ "v-28.8", "h29.1" ] ],
+    [ "uno:GND.1", "sr1:GND", "black", [ "v-38.4", "h-18.9", "v-57.6", "h9.6" ] ],
+    [ "uno:GND.1", "bargraph1:C3", "black", [ "v-38.4", "h-38.1", "v-230.4", "h38.4" ] ],
+    [ "uno:5V", "sr1:VCC", "red", [ "v19.1", "h119", "v-240", "h-105.6" ] ],
+    [ "sr1:Q7", "r1:2", "green", [ "v-19.2", "h-28.8" ] ],
+    [ "r1:1", "bargraph1:A3", "green", [ "h0", "v-19.2", "h28.8" ] ],
+    [ "r2:1", "bargraph1:A4", "green", [ "v-9.6", "h19.2" ] ],
+    [ "r3:1", "bargraph1:A5", "green", [ "h0", "v-9.6", "h9.6" ] ],
+    [ "r4:1", "bargraph1:A6", "green", [ "h0" ] ],
+    [ "r5:1", "bargraph1:A7", "green", [ "h0.65", "v-48" ] ],
+    [ "r6:1", "bargraph1:A8", "green", [ "h0", "v-9.6", "h-19.2" ] ],
+    [ "r7:1", "bargraph1:A9", "green", [ "h0", "v-19.2", "h-28.8" ] ],
+    [ "r8:1", "bargraph1:A10", "green", [ "h0", "v-28.8", "h-38.4" ] ],
+    [ "r2:2", "sr1:Q6", "green", [ "v8.4", "h19.2" ] ],
+    [ "r3:2", "sr1:Q5", "green", [ "h0", "v8.4", "h9.6" ] ],
+    [ "r4:2", "sr1:Q4", "green", [ "h0" ] ],
+    [ "r6:2", "sr1:Q2", "green", [ "h0", "v8.4", "h-19.2" ] ],
+    [ "r7:2", "sr1:Q1", "green", [ "h0", "v18", "h-28.8" ] ],
+    [ "bargraph1:C4", "bargraph1:C3", "green", [ "v-9.82", "h-9.6" ] ],
+    [ "bargraph1:C5", "bargraph1:C4", "green", [ "v-9.82", "h9.6" ] ],
+    [ "bargraph1:C6", "bargraph1:C5", "green", [ "v-9.82", "h9.6" ] ],
+    [ "bargraph1:C7", "bargraph1:C6", "green", [ "v-9.82", "h9.6" ] ],
+    [ "bargraph1:C8", "bargraph1:C7", "green", [ "v-9.82", "h-9.61" ] ],
+    [ "bargraph1:C9", "bargraph1:C8", "green", [ "v-9.82", "h-9.61" ] ],
+    [ "bargraph1:C10", "bargraph1:C9", "green", [ "v-9.82", "h-9.61" ] ],
+    [ "imu1:SCL", "uno:A5", "green", [ "h-48", "v76.72", "h-33.1" ] ],
+    [ "imu1:SDA", "uno:A4", "green", [ "h-43", "v72", "h-52.2" ] ],
+    [ "sr1:Q0", "r8:2", "green", [ "v8.4", "h19.2", "v-48", "h28.8" ] ],
+    [ "r5:2", "sr1:Q3", "green", [ "h0" ] ],
+    [ "sr2:MR", "sr2:VCC", "green", [ "v8.4", "h57.6" ] ],
+    [ "uno:GND.1", "sr2:GND", "black", [ "v-28.8", "h77.1", "v-67.2", "h9.6" ] ],
+    [ "uno:5V", "sr2:VCC", "red", [ "v19.1", "h119", "v-240", "h-9.6" ] ],
+    [ "sr2:Q7", "r9:2", "green", [ "v0" ] ],
+    [ "sr2:Q6", "r10:2", "green", [ "v-28.8" ] ],
+    [ "sr2:Q5", "r11:2", "green", [ "v0" ] ],
+    [ "sr2:Q4", "r12:2", "green", [ "v0" ] ],
+    [ "sr2:Q3", "r13:2", "green", [ "v0" ] ],
+    [ "sr2:Q2", "r14:2", "green", [ "v0" ] ],
+    [ "sr2:Q1", "r15:2", "green", [ "v0" ] ],
+    [ "sr2:Q0", "r16:2", "green", [ "v27.6", "h19.2" ] ],
+    [ "r9:1", "bargraph2:A1", "green", [ "h0", "v-9.6", "h-19.2" ] ],
+    [ "r10:1", "bargraph2:A2", "green", [ "v-14.2", "h-19.2" ] ],
+    [ "r11:1", "bargraph2:A3", "green", [ "v-18.8", "h-19.2" ] ],
+    [ "r12:1", "bargraph2:A4", "green", [ "h0", "v-22.2", "h-19.2" ] ],
+    [ "r13:1", "bargraph2:A5", "green", [ "h0", "v-25.8", "h-19.2" ] ],
+    [ "r14:1", "bargraph2:A6", "green", [ "h0", "v-28.8", "h-19.2" ] ],
+    [ "r15:1", "bargraph2:A7", "green", [ "h0", "v-31.4", "h-19.2" ] ],
+    [ "r16:1", "bargraph2:A8", "green", [ "h0", "v-38.4", "h-19.2" ] ],
+    [ "bargraph1:C10", "bargraph2:C1", "green", [ "v-9.82", "h9.59" ] ],
+    [ "bargraph2:C1", "bargraph2:C2", "green", [ "v-9.82", "h9.6" ] ],
+    [ "bargraph2:C2", "bargraph2:C3", "green", [ "v-9.82", "h9.6" ] ],
+    [ "bargraph2:C3", "bargraph2:C4", "green", [ "v-9.82", "h9.6" ] ],
+    [ "bargraph2:C4", "bargraph2:C5", "green", [ "v-9.82", "h9.6" ] ],
+    [ "bargraph2:C5", "bargraph2:C6", "green", [ "v-9.82", "h9.59" ] ],
+    [ "bargraph2:C6", "bargraph2:C7", "green", [ "v-9.82", "h9.59" ] ],
+    [ "bargraph2:C7", "bargraph2:C8", "green", [ "v-9.82", "h9.59" ] ],
+    [ "sr2:SHCP", "uno:13", "green", [ "v37.2", "h-96" ] ],
+    [ "sr2:STCP", "uno:4", "green", [ "v37.2", "h-13.5" ] ],
+    [ "uno:GND.1", "sr2:OE", "black", [ "v-28.8", "h125.1" ] ],
+    [ "sr1:DS", "sr2:Q7S", "green", [ "v12.4", "h96" ] ],
+    [ "sr2:DS", "uno:11", "green", [ "v42.2", "h-98" ] ],
+    [ "gnd1:GND", "btn1:1.r", "black", [ "v0" ] ],
+    [ "btn1:2.l", "uno:2", "green", [ "h-96", "v38.6", "h-57.6" ] ]
+  ],
+  "dependencies": {}
+}
