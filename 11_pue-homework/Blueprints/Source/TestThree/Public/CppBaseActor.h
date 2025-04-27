@@ -6,6 +6,28 @@
 #include "GameFramework/Actor.h"
 #include "CppBaseActor.generated.h"
 
+//class UStaticMeshComponent;
+
+UENUM(BlueprintType)
+enum class EMovementsState : uint8 {
+	Mobility,
+	Static
+};
+
+USTRUCT(BlueprintType)
+struct FTransformStruct {
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector CurrentLocation = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FRotator CurrentRotation = FRotator::ZeroRotator;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector CurrentScale = FVector(1.0f, 1.0f, 1.0f);
+};
+
 
 UCLASS()
 class TESTTHREE_API ACppBaseActor : public AActor
@@ -33,11 +55,30 @@ protected:
 	UPROPERTY(EditInstanceOnly)
 	bool IsAlive = true;
 
-public:	
+	UPROPERTY(EditAnywhere)
+	float Amplitude = 100.0;
+
+    UPROPERTY(EditAnywhere)
+    float Frequency = 1.5707;
+
+    UPROPERTY(EditAnywhere)
+    FVector InitLocation;
+
+
+	UFUNCTION(BlueprintCallable)
+	void ShowActorInformation();
+
+	UFUNCTION(BlueprintCallable)
+	void SinMovement();
+
+      public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* Mesh;
+
 
 private:
-	void ShowActorInformation();
 
 };
