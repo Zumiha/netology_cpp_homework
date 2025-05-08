@@ -5,7 +5,11 @@
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/InputComponent.h"
+
+#include "../Components/LMAHealthComponent.h"
+
 #include "GameFramework/SpringArmComponent.h"
+
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "InputActionValue.h"
@@ -31,14 +35,8 @@ ALMADefaultCharacter::ALMADefaultCharacter() {
   bUseControllerRotationPitch = false;
   bUseControllerRotationYaw = false;
   bUseControllerRotationRoll = false;
-
-
-  //GetCharacterMovement()->bOrientRotationToMovement = true;
-  //MovementComponentox = CreateDefaultSubobject<UCharacterMovementComponent>("MovementCompot");
-
-  //auto CharMovement = GetCharacterMovement();
-  //CharMovement.
-   
+  
+  HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
 }
 
 void ALMADefaultCharacter::BeginPlay() {
@@ -85,10 +83,8 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInpu
     PlayerInputComponent->BindAxis("MoveRight", this, &ALMADefaultCharacter::MoveRight);
     PlayerInputComponent->BindAxis("CameraZoom", this, &ALMADefaultCharacter::CameraZoom);
 
-    //PlayerInputComponent->BindAxisKey("CameraZoom", this, &ALMADefaultCharacter::CameraZoom);
-
-   //PlayerInputComponent->BindAction("CameraZoomInOut", IE_Released, this)
 }
+
 void ALMADefaultCharacter::Look(const FInputActionValue &Value) {
   // input is a Vector2D
   FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -112,17 +108,7 @@ void ALMADefaultCharacter::CameraZoom(float Value) {
    if (Value == 0.0f || Controller == nullptr)
      return;
 
-   auto TargetArmLength = SpringArmComponent->TargetArmLength;
-   float ChangedArmLength = TargetArmLength + Value * ZoomStep;
-   ArmLength = FMath::Clamp(ChangedArmLength, MinZoomLenght, MaxZoomLenght);
-   SpringArmComponent->TargetArmLength = FMath::FInterpTo(TargetArmLength, ArmLength, GetWorld()->GetDeltaSeconds(), 100.f );
-   
-   //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue,
-   //     "Value: " + FString::SanitizeFloat(Value) +
-   //     "\nTargetArmLength: " + FString::SanitizeFloat(TargetArmLength) +
-   //     "\nthisArmLength: " + FString::SanitizeFloat(ArmLength) +
-   //     "\nChangedArmLength: " + FString::SanitizeFloat(ChangedArmLength) +
-   //     "\nArmLength: "           +   FString::SanitizeFloat(SpringArmComponent->TargetArmLength),
-   //     true, FVector2D(.8f, .8f));
-   
+   ArmLength = FMath::Clamp(SpringArmComponent->TargetArmLength + Value * ZoomStep, MinZoomLenght, MaxZoomLenght);
+   SpringArmComponent->TargetArmLength = FMath::FInterpTo(SpringArmComponent->TargetArmLength, ArmLength, GetWorld()->GetDeltaSeconds(), 100.f );
+      
 }

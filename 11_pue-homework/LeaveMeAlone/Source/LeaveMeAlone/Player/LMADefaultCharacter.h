@@ -8,7 +8,10 @@
 
 class UCameraComponent;
 class USpringArmComponent;
+class ULMAHealthComponent;
+
 struct FInputActionValue;
+
 
 UCLASS()
 class LEAVEMEALONE_API ALMADefaultCharacter : public ACharacter {
@@ -24,21 +27,24 @@ protected:
   UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
   UCameraComponent *CameraComponent;
 
+  UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
+  ULMAHealthComponent *HealthComponent;
+
+
+
+
+
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Zoom")
   float MinZoomLenght = 10.0f;
-
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Zoom")
   float MaxZoomLenght = 2000.0f;
-
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera|Zoom")
   float ZoomStep = 20.f;
 
   UPROPERTY()
   UDecalComponent *CurrentCursor = nullptr;
-
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
   UMaterialInterface *CursorMaterial = nullptr;
-
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
   FVector CursorSize = FVector(20.0f, 40.0f, 40.0f);
 
