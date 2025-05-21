@@ -9,6 +9,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class ULMAHealthComponent;
+class ULMAWeaponComponent;
 
 class UAnimMontage;
 
@@ -28,6 +29,9 @@ public:
 protected:
   UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
   ULMAHealthComponent* HealthComponent;
+
+  UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+  ULMAWeaponComponent* WeaponComponent;
 
   UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
   USpringArmComponent *SpringArmComponent;

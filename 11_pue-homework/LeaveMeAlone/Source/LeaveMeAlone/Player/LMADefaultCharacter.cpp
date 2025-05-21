@@ -8,6 +8,7 @@
 #include "Components/InputComponent.h"
 
 #include "LeaveMeAlone/Components/Health/LMAHealthComponent.h"
+#include "LeaveMeAlone/Components/Weapon/LMAWeaponComponent.h"
 
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -34,8 +35,6 @@ ALMADefaultCharacter::ALMADefaultCharacter() {
   CameraComponent->SetFieldOfView(FOV);
   CameraComponent->bUsePawnControlRotation = false;
 
-  HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
-
   bUseControllerRotationPitch = false;
   bUseControllerRotationYaw = false;
   bUseControllerRotationRoll = false;
@@ -43,6 +42,9 @@ ALMADefaultCharacter::ALMADefaultCharacter() {
   GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
   GetCharacterMovement()->MaxCustomMovementSpeed = SprintSpeed;
    
+  HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
+  WeaponComponent = CreateDefaultSubobject<ULMAWeaponComponent>("WeaponComponent");
+
 }
 
 void ALMADefaultCharacter::BeginPlay() {
@@ -96,6 +98,8 @@ void ALMADefaultCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInpu
 
     PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ALMADefaultCharacter::SprintStart);
     PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ALMADefaultCharacter::SprintEnd);
+
+    PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &ULMAWeaponComponent::Fire);
 }
 
 void ALMADefaultCharacter::MoveForward(float Value) {
