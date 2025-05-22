@@ -4,7 +4,7 @@
 #include "LMABaseWeapon.h"
 #include "Components/SkeletalMeshComponent.h"
 
-//DEFINE_LOG_CATEGORY_STATIC(LogWeapon, All, All);
+DEFINE_LOG_CATEGORY_STATIC(LogWeapon, All, All);
 
 ALMABaseWeapon::ALMABaseWeapon()
 {
@@ -19,7 +19,7 @@ void ALMABaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//CurrentAmmoWeapon = AmmoWeapon;
+	CurrentAmmoWeapon = AmmoWeapon;
 }
 
 void ALMABaseWeapon::Tick(float DeltaTime)
@@ -29,7 +29,9 @@ void ALMABaseWeapon::Tick(float DeltaTime)
 
 void ALMABaseWeapon::Fire()
 {
-	Shoot();
+  if (CurrentAmmoWeapon.Bullets > 0) {
+    Shoot();
+  }
 }
 
 void ALMABaseWeapon::Shoot()
@@ -48,27 +50,27 @@ void ALMABaseWeapon::Shoot()
 		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 5.0f, 24, FColor::Red, false, 1.0f);
 	}
 
-	//DecrementBullets();
+	DecrementBullets();
 }
 
-//void ALMABaseWeapon::DecrementBullets()
-//{
-//	CurrentAmmoWeapon.Bullets--;
-//	UE_LOG(LogWeapon, Display, TEXT("Bullets = %s"), *FString::FromInt(CurrentAmmoWeapon.Bullets));
-//
-//	if (IsCurrentClipEmpty())
-//	{
-//		ChangeClip();
-//	}
-//	
-//}
+void ALMABaseWeapon::ChangeClip()
+{
+	CurrentAmmoWeapon.Bullets = AmmoWeapon.Bullets;
+}
 
-//bool ALMABaseWeapon::IsCurrentClipEmpty() const
-//{
-//	return CurrentAmmoWeapon.Bullets==0;
-//}
-//
-//void ALMABaseWeapon::ChangeClip()
-//{
-//	CurrentAmmoWeapon.Bullets = AmmoWeapon.Bullets;
-//}
+void ALMABaseWeapon::DecrementBullets()
+{
+	CurrentAmmoWeapon.Bullets--;
+	UE_LOG(LogWeapon, Display, TEXT("Bullets = %s"), *FString::FromInt(CurrentAmmoWeapon.Bullets));
+
+	if (IsCurrentClipEmpty())
+	{
+		ChangeClip();
+	}
+	
+}
+
+bool ALMABaseWeapon::IsCurrentClipEmpty() const
+{
+	return CurrentAmmoWeapon.Bullets == 0;
+}
