@@ -12,7 +12,6 @@ ALMABaseWeapon::ALMABaseWeapon()
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("Weapon");
 	SetRootComponent(WeaponMesh);
-
 }
 
 void ALMABaseWeapon::BeginPlay()
@@ -27,11 +26,13 @@ void ALMABaseWeapon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ALMABaseWeapon::Fire()
-{
-  if (CurrentAmmoWeapon.Bullets > 0) {
-    Shoot();
-  }
+void ALMABaseWeapon::Fire() {
+	if (CurrentAmmoWeapon.Bullets > 0) {    
+		Shoot();
+	}
+	else {
+
+	}
 }
 
 void ALMABaseWeapon::Shoot()
@@ -68,9 +69,4 @@ void ALMABaseWeapon::DecrementBullets()
 		ChangeClip();
 	}
 	
-}
-
-bool ALMABaseWeapon::IsCurrentClipEmpty() const
-{
-	return CurrentAmmoWeapon.Bullets == 0;
 }

@@ -35,6 +35,11 @@ public:
 	
 	void Fire();
 	void ChangeClip();
+
+	float getFireRate() { return this->FireRate; };
+	bool IsCurrentClipEmpty() const {return CurrentAmmoWeapon.Bullets == 0;}
+	bool IsCurrentClipFull() const {return CurrentAmmoWeapon.Bullets == AmmoWeapon.Bullets;}
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Weapon")
 	USkeletalMeshComponent* WeaponMesh;
@@ -43,14 +48,15 @@ protected:
 	float TraceDistance = 800.0f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Weapon")
-	FAmmoWeapon AmmoWeapon {30, 0, true};
+	FAmmoWeapon AmmoWeapon {30, 0, true};	
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon") 
+	float FireRate = 0.08f;
 
 	virtual void BeginPlay() override;
 
 	void Shoot();
-
 	void DecrementBullets();
-	bool IsCurrentClipEmpty() const;
 
 public:
 	virtual void Tick(float DeltaTime) override;

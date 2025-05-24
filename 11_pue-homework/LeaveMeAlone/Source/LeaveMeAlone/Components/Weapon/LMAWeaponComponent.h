@@ -9,6 +9,11 @@
 class ALMABaseWeapon;
 class UAnimMontage;
 
+enum WeaponFireMode {
+	E_SingleFire,
+	E_FullAuto
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class LEAVEMEALONE_API ULMAWeaponComponent : public UActorComponent
 {
@@ -21,8 +26,10 @@ public:
     UPROPERTY()
     ALMABaseWeapon *Weapon = nullptr;
 			
-    void Fire();
+    void FireStart();
+    void FireStop();
     void Reload();
+    void ChangeFireMode();
 
   protected:
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
@@ -41,10 +48,16 @@ public:
 private:
 	void SpawnWeapon();
 
+	bool bIsShooting = false;
 	bool AnimReloading = false;
-    	
+
+	WeaponFireMode FireMode;
+
+	float WeaponFireRate;    
+	void WeaponFire();
     void InitAnimNotify();
 	void OnNotifyReloadFinished(USkeletalMeshComponent *SkeletalMesh);
-	bool CanReload() const;
+	bool CantReload() const;
 
+	FTimerHandle FireTimer;
 };
