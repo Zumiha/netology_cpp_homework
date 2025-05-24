@@ -55,6 +55,7 @@ private:
 
 	float WeaponFireRate;    
 	void WeaponFire();
+	void WeaponReload();
     void InitAnimNotify();
 	void OnNotifyReloadFinished(USkeletalMeshComponent *SkeletalMesh);
 	bool CantReload() const;

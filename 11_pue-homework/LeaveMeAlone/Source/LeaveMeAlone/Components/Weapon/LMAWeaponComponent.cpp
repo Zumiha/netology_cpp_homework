@@ -51,7 +51,8 @@ void ULMAWeaponComponent::SpawnWeapon() {
 	  //if (!Character) GEngine->AddOnScreenDebugMessage(-1, 4.f, FColor::Cyan, FString::Printf(TEXT("No character!")));
       FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
       Weapon->AttachToComponent(Character->GetMesh(), AttachmentRules,"r_Weapon_Socket");
-    }  
+    } 
+    Weapon->WeapopnNeedReload.AddUObject(this, &ULMAWeaponComponent::Reload);
   }
 }
 
@@ -77,7 +78,7 @@ void ULMAWeaponComponent::WeaponFire() {
     }
 }
 
-void ULMAWeaponComponent::Reload() {
+void ULMAWeaponComponent::WeaponReload() {
     if (CantReload()) {
         //UE_LOG(LogTemp, Display, TEXT("Can't reload!"));
         return;
@@ -88,6 +89,12 @@ void ULMAWeaponComponent::Reload() {
     ACharacter *Character = Cast<ACharacter>(GetOwner());
     Character->PlayAnimMontage(ReloadMontage);
     //UE_LOG(LogTemp, Display, TEXT("Reload montage launched"));
+}
+
+
+
+void ULMAWeaponComponent::Reload() {
+    WeaponReload();
 }
 
 void ULMAWeaponComponent::ChangeFireMode() {

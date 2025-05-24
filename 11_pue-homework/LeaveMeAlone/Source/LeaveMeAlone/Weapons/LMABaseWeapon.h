@@ -6,8 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "LMABaseWeapon.generated.h"
 
-
 class USkeletalMeshComponent;
+
+DECLARE_MULTICAST_DELEGATE(FNoAmmoInClipSignature)
 
 USTRUCT(BlueprintType)
 struct FAmmoWeapon
@@ -31,14 +32,15 @@ class LEAVEMEALONE_API ALMABaseWeapon : public AActor
 
 public:
 	ALMABaseWeapon();
-
-	
+		
 	void Fire();
 	void ChangeClip();
 
 	float getFireRate() { return this->FireRate; };
 	bool IsCurrentClipEmpty() const {return CurrentAmmoWeapon.Bullets == 0;}
 	bool IsCurrentClipFull() const {return CurrentAmmoWeapon.Bullets == AmmoWeapon.Bullets;}
+
+	FNoAmmoInClipSignature WeapopnNeedReload;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Weapon")
