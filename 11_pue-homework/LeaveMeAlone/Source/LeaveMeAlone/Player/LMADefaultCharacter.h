@@ -109,5 +109,7 @@ private:
   void RotationPlayerOnCursor();
 
   void OnDeath();
+  
+  UFUNCTION()
   void OnHealthChanged(float NewHealth);
 };
