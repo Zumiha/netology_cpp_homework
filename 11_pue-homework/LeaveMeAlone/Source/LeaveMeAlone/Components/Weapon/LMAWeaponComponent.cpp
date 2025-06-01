@@ -53,6 +53,7 @@ void ULMAWeaponComponent::SpawnWeapon() {
       Weapon->AttachToComponent(Character->GetMesh(), AttachmentRules,"r_Weapon_Socket");
     } 
     Weapon->WeapopnNeedReload.AddUObject(this, &ULMAWeaponComponent::Reload);
+    Weapon->AmmoWeaponChange.AddUObject(this, &ULMAWeaponComponent::OnBulletsValueChange);
   }
 }
 
@@ -85,9 +86,9 @@ void ULMAWeaponComponent::WeaponReload() {
     }
     FireStop();
     AnimReloading = true;
-    Weapon->ChangeClip();
     ACharacter *Character = Cast<ACharacter>(GetOwner());
     Character->PlayAnimMontage(ReloadMontage);
+    Weapon->ChangeClip();
     //UE_LOG(LogTemp, Display, TEXT("Reload montage launched"));
 }
 

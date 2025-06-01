@@ -8,7 +8,13 @@
 
 class USkeletalMeshComponent;
 
-DECLARE_MULTICAST_DELEGATE(FNoAmmoInClipSignature)
+DECLARE_MULTICAST_DELEGATE(FNoAmmoInClipSignature);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FCurrentAmmoSignature, int, int);
+
+enum AmmoOption {
+	Current,
+	Max
+};
 
 USTRUCT(BlueprintType)
 struct FAmmoWeapon
@@ -37,10 +43,13 @@ public:
 	void ChangeClip();
 
 	float getFireRate() { return this->FireRate; };
+	int GetAmmo(AmmoOption AmmoOption);
+
 	bool IsCurrentClipEmpty() const {return CurrentAmmoWeapon.Bullets == 0;}
 	bool IsCurrentClipFull() const {return CurrentAmmoWeapon.Bullets == AmmoWeapon.Bullets;}
 
 	FNoAmmoInClipSignature WeapopnNeedReload;
+	FCurrentAmmoSignature AmmoWeaponChange;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Weapon")

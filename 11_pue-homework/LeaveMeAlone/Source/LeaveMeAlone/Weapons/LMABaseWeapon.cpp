@@ -57,12 +57,25 @@ void ALMABaseWeapon::Shoot()
 void ALMABaseWeapon::ChangeClip()
 {
 	CurrentAmmoWeapon.Bullets = AmmoWeapon.Bullets;
+	AmmoWeaponChange.Broadcast(CurrentAmmoWeapon.Bullets, AmmoWeapon.Bullets);
+}
+
+int ALMABaseWeapon::GetAmmo(AmmoOption AmmoOption) { 
+	if (AmmoOption == AmmoOption::Current) {
+  		return this->CurrentAmmoWeapon.Bullets;
+	}
+	else if (AmmoOption == AmmoOption::Max) {
+        return this->AmmoWeapon.Bullets;
+	}
+	return 0;
 }
 
 void ALMABaseWeapon::DecrementBullets()
 {
-	CurrentAmmoWeapon.Bullets--;
-	UE_LOG(LogWeapon, Display, TEXT("Bullets = %s"), *FString::FromInt(CurrentAmmoWeapon.Bullets));
+	CurrentAmmoWeapon.Bullets--;	
+	AmmoWeaponChange.Broadcast(CurrentAmmoWeapon.Bullets, AmmoWeapon.Bullets);
+
+	//UE_LOG(LogWeapon, Display, TEXT("Bullets = %s"), *FString::FromInt(CurrentAmmoWeapon.Bullets));
 
 	if (IsCurrentClipEmpty())
 	{

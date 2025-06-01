@@ -62,7 +62,7 @@ void ALMADefaultCharacter::BeginPlay() {
 
 	OnHealthChanged(HealthComponent->GetHealth());
 	HealthComponent->OnDeath.AddUObject(this, &ALMADefaultCharacter::OnDeath);
-    HealthComponent->OnHealthChanged.AddDynamic(this, &ALMADefaultCharacter::OnHealthChanged);
+    //HealthComponent->OnHealthChanged.AddDynamic(this, &ALMADefaultCharacter::OnHealthChanged);
 }
 
 

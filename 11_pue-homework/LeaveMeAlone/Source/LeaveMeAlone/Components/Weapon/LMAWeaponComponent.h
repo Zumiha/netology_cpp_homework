@@ -9,6 +9,8 @@
 class ALMABaseWeapon;
 class UAnimMontage;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAmmoValueChange, int, Bullets, int, MaxBullets);
+
 enum WeaponFireMode {
 	E_SingleFire,
 	E_FullAuto
@@ -25,6 +27,9 @@ public:
 
     UPROPERTY()
     ALMABaseWeapon *Weapon = nullptr;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Signals")
+    FAmmoValueChange AmmoValueChange;
 			
     void FireStart();
     void FireStop();
@@ -59,6 +64,9 @@ private:
     void InitAnimNotify();
 	void OnNotifyReloadFinished(USkeletalMeshComponent *SkeletalMesh);
 	bool CantReload() const;
+
+	UFUNCTION()
+	void OnBulletsValueChange(int NewBullets, int MaxBull) { AmmoValueChange.Broadcast(NewBullets, MaxBull);}
 
 	FTimerHandle FireTimer;
 };
