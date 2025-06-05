@@ -16,5 +16,9 @@ class LEAVEMEALONE_API ALMAGameMode : public AGameModeBase
 
 public:
     ALMAGameMode();
-	
+
+protected:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LevelTimer")
+    int GameTime = 10;
+
 };
