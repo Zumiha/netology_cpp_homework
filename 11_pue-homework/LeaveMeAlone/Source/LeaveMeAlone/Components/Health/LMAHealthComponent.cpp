@@ -43,5 +43,6 @@ void ULMAHealthComponent::OnTakeAnyDamage(AActor *DamagedActor, float Damage, co
 
   if (IsDead()) {
     OnDeath.Broadcast();
+    //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("HEALTH COMP DEATH")), true, FVector2D(5.f, 5.f));
   }
 }

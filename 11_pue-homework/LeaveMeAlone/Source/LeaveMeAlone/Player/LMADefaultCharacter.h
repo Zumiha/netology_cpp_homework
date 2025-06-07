@@ -108,6 +108,7 @@ private:
   void CameraZoom(float Value);
   void RotationPlayerOnCursor();
 
+  UFUNCTION()
   void OnDeath();
   
   UFUNCTION()

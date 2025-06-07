@@ -60,9 +60,11 @@ void ALMADefaultCharacter::BeginPlay() {
     } 
     SpringArmComponent->TargetArmLength = ArmLength;
 
-	OnHealthChanged(HealthComponent->GetHealth());
-	HealthComponent->OnDeath.AddUObject(this, &ALMADefaultCharacter::OnDeath);
-    HealthComponent->OnHealthChanged.AddDynamic(this, &ALMADefaultCharacter::OnHealthChanged);
+	//OnHealthChanged(HealthComponent->GetHealth());
+	//HealthComponent->OnDeath.AddUObject(this, &ALMADefaultCharacter::OnDeath);
+     
+	HealthComponent->OnDeath.AddDynamic(this, &ALMADefaultCharacter::OnDeath);
+    //HealthComponent->OnHealthChanged.AddDynamic(this, &ALMADefaultCharacter::OnHealthChanged);
 }
 
 
@@ -148,7 +150,8 @@ void ALMADefaultCharacter::RotationPlayerOnCursor() {
 }
 
 void ALMADefaultCharacter::OnDeath() {
-  CurrentCursor->DestroyRenderState_Concurrent();
+  //GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("PLAYER DEATH")), true, FVector2D(7.f, 7.f));
+  //CurrentCursor->DestroyRenderState_Concurrent();
 
   PlayAnimMontage(DeathMontage);
 

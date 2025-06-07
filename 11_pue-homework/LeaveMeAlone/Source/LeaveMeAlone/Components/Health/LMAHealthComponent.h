@@ -6,7 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "LMAHealthComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnDeath);
+//DECLARE_MULTICAST_DELEGATE(FOnDeath);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
+
 //DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float, Health);
@@ -32,7 +35,10 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Signals")
 	FOnHealthChanged OnHealthChanged;
 
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Signals")
     FOnDeath OnDeath;
+    
+	//FOnDeath OnDeath;
     //FOnHealthChanged OnHealthChanged;
 
 protected:
