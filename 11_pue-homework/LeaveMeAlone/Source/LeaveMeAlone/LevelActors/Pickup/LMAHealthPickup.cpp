@@ -16,12 +16,15 @@ ALMAHealthPickup::ALMAHealthPickup() {
 
 void ALMAHealthPickup::BeginPlay() { Super::BeginPlay(); }
 
-void ALMAHealthPickup::NotifyActorBeginOverlap(AActor *OtherActor) {
-  Super::NotifyActorBeginOverlap(OtherActor);
-  const auto Charcter = Cast<ALMADefaultCharacter>(OtherActor);
-  if (GivePickup(Charcter)) {
-    PickupWasTaken();
-  }
+void ALMAHealthPickup::NotifyActorBeginOverlap(AActor *OtherActor) {    
+    Super::NotifyActorBeginOverlap(OtherActor);  
+    if (const auto Charcter = Cast<ALMADefaultCharacter>(OtherActor)) {
+        if (GivePickup(Charcter)) {
+          PickupWasTaken();
+        }
+    } else {
+        return;
+    }
 }
 
 void ALMAHealthPickup::Tick(float DeltaTime) { Super::Tick(DeltaTime); }
