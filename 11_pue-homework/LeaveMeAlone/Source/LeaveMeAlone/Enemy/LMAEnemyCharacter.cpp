@@ -2,6 +2,8 @@
 
 
 #include "LMAEnemyCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 #include "LeaveMeAlone/Components/Health/LMAHealthComponent.h"
 
 
@@ -12,7 +14,8 @@ ALMAEnemyCharacter::ALMAEnemyCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	HealthComponent = CreateDefaultSubobject<ULMAHealthComponent>("HealthComponent");
 
-
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	GetCharacterMovement()->MaxCustomMovementSpeed = SprintSpeed;
 }
 
 // Called when the game starts or when spawned

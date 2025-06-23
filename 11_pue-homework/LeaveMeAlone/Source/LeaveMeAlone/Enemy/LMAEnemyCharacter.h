@@ -27,9 +27,14 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components|Health")
     ULMAHealthComponent *HealthComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement|Speed")
+	float WalkSpeed = 300.f;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement|Speed")
+    float SprintSpeed = 600.f;
 
-public:	
+  public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

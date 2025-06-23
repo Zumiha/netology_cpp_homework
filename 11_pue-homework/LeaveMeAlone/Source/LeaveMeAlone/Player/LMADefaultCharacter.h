@@ -40,10 +40,10 @@ protected:
   UCameraComponent *CameraComponent;
 
   UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement|Speed")
-  float WalkSpeed = 500.f;
+  float WalkSpeed = 300.f;
   
   UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement|Speed")
-  float SprintSpeed = 900.f;
+  float SprintSpeed = 700.f;
 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Speed")
   bool IsSprinting = false;
