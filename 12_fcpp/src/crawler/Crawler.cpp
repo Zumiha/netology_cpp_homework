@@ -15,9 +15,10 @@
 // }
 
 webCrawler::webCrawler(int argc, char* argv[])
-{
-    if (argc < 2) {this->parser = std::make_unique<IniParser>(ini_file_name); std::cout << "created object with default file\n";}
-    else {this->parser = std::make_unique<IniParser>(argv[argc-1]); std::cout << "created object with declared file\n";}
+{   
+    std::string def = argv[1];
+    if (argc > 1 && def == "-cf") {this->parser = std::make_unique<IniParser>(argv[2]); std::cout << "created object with declared file\n";}
+    else {this->parser = std::make_unique<IniParser>(ini_file_name); std::cout << "created object with default file\n";}
 
     this->setSearchSettings();
 }
