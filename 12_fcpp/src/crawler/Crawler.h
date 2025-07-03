@@ -1,5 +1,6 @@
 #include <memory>
 #include "IniParser.h"
+#include "ThreadPool.h"
 
 struct DbInfo {
     std::string host;
@@ -24,10 +25,13 @@ class webCrawler {
 public:
     webCrawler(int argc, char* argv[]);
     ~webCrawler();
+    void runSearch();
+    
+    void printSettings();
 
+protected:
     void setSearchSettings();
 
-    void printSettings();
 private:
     CrawlParams search_settings;
     std::unique_ptr<IniParser> parser;

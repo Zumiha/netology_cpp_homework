@@ -3,8 +3,7 @@
 int main(int argc, char* argv[]) {   
     try {
         
-        webCrawler spider(argc, argv);
-        spider.printSettings();        
+        webCrawler spider(argc, argv);      
     }
     catch (const std::exception& ex) {
         std::cout << ex.what() << std::endl;

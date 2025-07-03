@@ -1,19 +1,5 @@
 #include "Crawler.h"
 
-// webCrawler::webCrawler(std::string& _str)
-// {
-//     if (_str != "") {this->parser = new IniParser(_str);}
-//     else {this->parser = new IniParser(ini_file_name);}
-// }
-
-// webCrawler::~webCrawler()
-// {
-//     if (this->parser != nullptr) {
-//         delete this->parser;
-//         this->parser = nullptr;
-//     }
-// }
-
 webCrawler::webCrawler(int argc, char* argv[])
 {   
     std::string def = argv[1];
@@ -25,6 +11,12 @@ webCrawler::webCrawler(int argc, char* argv[])
 
 webCrawler::~webCrawler()
 {
+
+}
+
+void webCrawler::runSearch()
+{
+
 }
 
 void webCrawler::setSearchSettings()
