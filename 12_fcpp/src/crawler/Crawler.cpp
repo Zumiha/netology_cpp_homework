@@ -2,10 +2,15 @@
 
 webCrawler::webCrawler(int argc, char* argv[])
 {   
-    std::string def = argv[1];
-    if (argc > 1 && def == "-cf") {this->parser = std::make_unique<IniParser>(argv[2]); std::cout << "created object with declared file\n";}
-    else {this->parser = std::make_unique<IniParser>(ini_file_name); std::cout << "created object with default file\n";}
-
+    if (argv == nullptr || argc < 2) {
+        this->parser = std::make_unique<IniParser>(ini_file_name); std::cout << "created object with default file\n";
+    } else {
+        std::string def = argv[1];
+        if (argc > 1 && def == "-cf") {
+            this->parser = std::make_unique<IniParser>(argv[2]);
+            std::cout << "created object with declared file\n";
+        }
+    }
     this->setSearchSettings();
 
     // Initialize thread pool
@@ -163,6 +168,7 @@ void webCrawler::crawlUrl(UrlInfo url_data)
 std::string webCrawler::downloadPage(const std::string &url)
 {
     // Код для загрузки страницы
+    return url;
 }
 
 
@@ -185,9 +191,11 @@ void webCrawler::indexWords(const std::string& content, const std::string& url)
 std::string webCrawler::normalizeUrl(const std::string& url, const std::string& base_url) 
 {
     // Код приведения формата ссылки
+    return url;
 }
 
 bool webCrawler::isValidUrl(const std::string& url) 
 {
     // Проверка валидности ссылки
+    return false;
 }
