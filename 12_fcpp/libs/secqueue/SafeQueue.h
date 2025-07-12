@@ -3,6 +3,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
+#include <chrono>
 
 
 template <class T>
@@ -20,17 +21,25 @@ public:
 
 	bool pop(T& pop_val) {
 		std::unique_lock<std::mutex> mtx_lock(mtx);
-		while(queue_is_empty) {
-			condt_var.wait(mtx_lock);
-		}
-		if (queue.empty()) { 
-			return false;
-		} else {
-			pop_val = std::move(queue.front());
-			queue.pop();
-			return true;
-		}
+        
+        // Ждем, чтобы предотвратить блокировку.
+        if (condt_var.wait_for(lock, std::chrono::milliseconds(100), [this] { return !queue.empty(); })) {
+            pop_val = std::move(queue.front());
+            queue.pop();
+            return true;
+        }
+        return false;
 	}
+
+	size_t size() const {
+        std::lock_guard<std::mutex> mtx_lock(mtx);
+        return queue.size();
+    }
+
+    bool empty() const {
+        std::lock_guard<std::mutex> mtx_lock(mtx);
+        return queue.empty();
+    }
 
 private:
 	mutable std::mutex mtx;

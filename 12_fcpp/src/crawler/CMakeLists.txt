@@ -13,6 +13,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCE_LIB} ${SOURCE_HD})
 # Link to IniParser since Crawler.cpp uses it
 target_link_libraries(${PROJECT_NAME} PUBLIC IniParser 
                                             SafeThreadPool
+                                            UtilsLibs
                                             )
 
 # Include IniParser headers
@@ -20,5 +21,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/parser
     ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/secqueue
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/utils
     )
 # target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/secqueue)
