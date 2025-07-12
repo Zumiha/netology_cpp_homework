@@ -23,7 +23,7 @@ public:
 		std::unique_lock<std::mutex> mtx_lock(mtx);
         
         // Ждем, чтобы предотвратить блокировку.
-        if (condt_var.wait_for(lock, std::chrono::milliseconds(100), [this] { return !queue.empty(); })) {
+        if (condt_var.wait_for(mtx_lock, std::chrono::milliseconds(100), [this] { return !queue.empty(); })) {
             pop_val = std::move(queue.front());
             queue.pop();
             return true;
