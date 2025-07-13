@@ -11,15 +11,19 @@ enum class ProtocolType
 
 struct Link
 {
+	std::string link;
 	ProtocolType protocol;
 	std::string hostName;
 	std::string query;
+	std::string adress;
 
 	bool operator==(const Link& l) const
 	{
 		return protocol == l.protocol
 			&& hostName == l.hostName
-			&& query == l.query;
+			&& query == l.query
+			&& link == l.link
+			&& adress == l.adress;
 	}
 };
 

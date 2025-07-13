@@ -20,6 +20,8 @@ std::optional<Link> URLParser::parse(const std::string &url)
 
     Link link;
 
+    link.link = url;
+
     std::string protocol = match[1].str();
     std::transform(protocol.begin(), protocol.end(), protocol.begin(), ::tolower);
 
@@ -43,5 +45,7 @@ std::optional<Link> URLParser::parse(const std::string &url)
         link.query = "/";
     }
     
+    link.adress = match[2].str() + match[3].str();
+
     return link;
 }

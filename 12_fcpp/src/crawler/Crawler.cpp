@@ -131,15 +131,16 @@ void webCrawler::setSearchSettings()
 
 void webCrawler::crawlUrl(UrlInfo url_data)
 {
+    auto url_link = URLParser::parse(url_data.address); // Parsing link to readable adress
     std::cout << "Starting to crawl: " << url_data.address << " (depth: " << url_data.search_depth << ")" << std::endl;
 
     {   //проверяем посетили ли уже ссылку
         std::lock_guard<std::mutex> lock(visited_mutex);
-        if (visited_urls.find(url_data.address) != visited_urls.end()) { 
-            std::cout << "Already visited: " << url_data.address << " - skipping" << std::endl;
+        if (visited_urls.find(url_link->adress) != visited_urls.end()) { 
+            std::cout << "Already visited: " << url_link->adress << " - skipping" << std::endl;
             return;
         }
-        visited_urls.insert(url_data.address); // Добавляем в посещенные ссылки
+        visited_urls.insert(url_link->adress); // Добавляем в посещенные ссылки
     }
 
     // проверяем ограничение по страницам
@@ -149,9 +150,9 @@ void webCrawler::crawlUrl(UrlInfo url_data)
     }
 
     // Download page content
-    std::string content = downloadPage(url_data.address);
+    std::string content = downloadPage(url_link->adress);
     if (content.empty()) {
-        std::cout << "Failed to download: " << url_data.address << std::endl;
+        std::cout << "Failed to download: " << url_link->adress << std::endl;
         return;
     }
 
@@ -160,7 +161,7 @@ void webCrawler::crawlUrl(UrlInfo url_data)
     // Обработка страницы
     processPage(url_data.address, content, url_data.search_depth);
     
-    std::cout << "Completed: " << url_data.address << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
+    std::cout << "Completed: " << url_link->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
 
 }
 
