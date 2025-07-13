@@ -17,6 +17,7 @@ set(PROJECT_SOURCES
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/crawler)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/parser iniparses-build)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/secqueue)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 

@@ -45,14 +45,14 @@ void webCrawler::startCrawling()
     pending_urls.push(initial_url);
     pending_count++;
     
-    // Processing loop using ThreadPool
-    while   (   !should_stop.load() && 
-                (active_workers.load() > 0 || pending_count.load() > 0) &&
-                total_pages_crawled.load() < search_settings.max_pages
+    // Рабочий цикл используя ThreadPool
+    while   (   !should_stop.load() &&                                      // Пока НЕ сказано остановиться
+                (active_workers.load() > 0 || pending_count.load() > 0) &&  // Пока рабочих больше 0 и добавленых строк больше 0
+                total_pages_crawled.load() < search_settings.max_pages      // Пока НЕ достигли предела по количества обработанных страниц
             ) 
     {        
         UrlInfo url_data;
-        if (pending_urls.pop(url_data)) { 
+        if (pending_urls.pop(url_data)) { // Если в очереди ссылок есть ссылки, то передаем из стопки в url_data 
             pending_count--;
             
             // Добавляем задачи краулера в ThreadPool

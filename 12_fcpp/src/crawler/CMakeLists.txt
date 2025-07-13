@@ -13,7 +13,7 @@ add_library(${PROJECT_NAME} STATIC ${SOURCE_LIB} ${SOURCE_HD})
 # Link to IniParser since Crawler.cpp uses it
 target_link_libraries(${PROJECT_NAME} PUBLIC IniParser 
                                             SafeThreadPool
-                                            # UtilsLibs
+                                            UtilsLibs
                                             )
 
 # Include IniParser headers
