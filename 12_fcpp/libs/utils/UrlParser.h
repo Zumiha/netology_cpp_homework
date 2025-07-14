@@ -11,11 +11,11 @@ enum class ProtocolType
 
 struct Link
 {
-	std::string link;
-	ProtocolType protocol;
-	std::string hostName;
-	std::string query;
-	std::string adress;
+	std::string link;		// Неотформатированный вид ссылки
+	ProtocolType protocol;	
+	std::string hostName;	// Имя хоста - адрес домена 
+	std::string query;		// Адрес идущий после домена
+	std::string adress;		// Отформатированный вид ссылки
 
 	bool operator==(const Link& l) const
 	{
@@ -24,6 +24,16 @@ struct Link
 			&& query == l.query
 			&& link == l.link
 			&& adress == l.adress;
+	}
+
+	Link& operator=(const Link& l) { // а нужно ли это если есть std::optional<Link> ?
+		if (this == &l) return *this;
+
+		protocol = l.protocol;
+		hostName = l.hostName;
+		query = l.query;
+		link = l.link;
+		adress = l.adress;	
 	}
 };
 

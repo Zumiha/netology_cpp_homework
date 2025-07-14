@@ -21,11 +21,19 @@ struct DbInfo {
 
 struct UrlInfo
 {
-    std::string address;
+    std::optional<Link> url_link_info;
+    // std::string address;
 	int	search_depth = 1;
 
     UrlInfo() = default;
-    UrlInfo(const std::string& addr, int depth) : address(addr), search_depth(depth) {}
+    UrlInfo(const std::string& addr, int depth) {
+        url_link_info = URLParser::parse(addr);
+        search_depth = depth;        
+    }
+    UrlInfo(const std::optional<Link>& link, int depth) {
+        url_link_info = link;
+        search_depth = depth;        
+    }
 };
 
 struct CrawlParams
@@ -64,7 +72,7 @@ private:
     void crawlUrl(UrlInfo url_data);
 
     std::string downloadPage(const std::string& url);
-    void processPage(const std::string& url, const std::string& content, int current_depth);
+    void processPage(const std::optional<Link>& url, const std::string& content, int current_depth);
     void extractLinks(const std::string& content, const std::string& base_url, int current_depth);
     void indexWords(const std::string& content, const std::string& url);
     std::string normalizeUrl(const std::string& url, const std::string& base_url);

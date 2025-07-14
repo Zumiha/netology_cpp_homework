@@ -36,12 +36,12 @@ void webCrawler::startCrawling()
     should_stop.store(false);
     
     std::cout << "Starting web crawling..." << std::endl;
-    std::cout << "Initial URL: " << search_settings.url.address << std::endl;
+    std::cout << "Initial URL: " << search_settings.url.url_link_info->link << std::endl;
     std::cout << "Max depth: " << search_settings.url.search_depth << std::endl;
     std::cout << "Max pages: " << search_settings.max_pages << std::endl;
     
     // Добавляем начальную ссылку в очередь ссылок
-    UrlInfo initial_url(search_settings.url.address, 1);
+    UrlInfo initial_url(this->search_settings.url.url_link_info, 1);
     pending_urls.push(initial_url);
     pending_count++;
     
@@ -61,7 +61,7 @@ void webCrawler::startCrawling()
                 try {
                     crawlUrl(url_data);
                 } catch (const std::exception& e) {
-                    std::cerr << "Error crawling " << url_data.address << ": " << e.what() << std::endl;
+                    std::cerr << "Error crawling " << url_data.url_link_info->link << ": " << e.what() << std::endl;
                 }
                 active_workers--;
             });
@@ -96,7 +96,7 @@ void webCrawler::stopCrawling()
 void webCrawler::printSettings()
 {
     std::cout << "\n";
-    std::cout << this->search_settings.url.address << "\n";
+    std::cout << this->search_settings.url.url_link_info->link << "\n";
 
     std::cout << this->search_settings.db_connection.host << "\n";
     std::cout << this->search_settings.db_connection.port << "\n";
@@ -113,7 +113,7 @@ void webCrawler::printSettings()
 
 void webCrawler::setSearchSettings()
 {
-    this->search_settings.url.address = this->parser->getValue<std::string>("url.urltest");
+    this->search_settings.url.url_link_info = URLParser::parse(this->parser->getValue<std::string>("url.urltest"));
     this->search_settings.url.search_depth = this->parser->getValue<int>("indexing.search_depth");
 
 
@@ -131,37 +131,47 @@ void webCrawler::setSearchSettings()
 
 void webCrawler::crawlUrl(UrlInfo url_data)
 {
-    auto url_link = URLParser::parse(url_data.address); // Parsing link to readable adress
-    std::cout << "Starting to crawl: " << url_data.address << " (depth: " << url_data.search_depth << ")" << std::endl;
-
-    {   //проверяем посетили ли уже ссылку
+    // auto url_link = URLParser::parse(url_data.address); // Parsing link to std::optional<Link> used as struct Link
+    std::cout << "Starting to crawl: " << url_data.url_link_info->link << " (depth: " << url_data.search_depth << ")" << std::endl;
+    
+    // Проверяем посетили ли уже ссылку
+    {   
         std::lock_guard<std::mutex> lock(visited_mutex);
-        if (visited_urls.find(url_link->adress) != visited_urls.end()) { 
-            std::cout << "Already visited: " << url_link->adress << " - skipping" << std::endl;
+        if (visited_urls.find(url_data.url_link_info->adress) != visited_urls.end()) { 
+            std::cout << "Already visited: " << url_data.url_link_info->adress << " - skipping" << std::endl;
             return;
         }
-        visited_urls.insert(url_link->adress); // Добавляем в посещенные ссылки
+        visited_urls.insert(url_data.url_link_info->adress); // Добавляем в посещенные ссылки
     }
 
-    // проверяем ограничение по страницам
+    // Проверяем ограничение по страницам
     if (total_pages_crawled.load() >= search_settings.max_pages) {
         std::cout << "Reached maximum pages limit" << std::endl;
         return;
     }
 
     // Download page content
-    std::string content = downloadPage(url_link->adress);
+    std::string content = downloadPage(url_data.url_link_info->adress);
     if (content.empty()) {
-        std::cout << "Failed to download: " << url_link->adress << std::endl;
+        std::cout << "Failed to download: " << url_data.url_link_info->adress << std::endl;
         return;
     }
 
     total_pages_crawled++;
 
     // Обработка страницы
-    processPage(url_data.address, content, url_data.search_depth);
+    processPage(url_data.url_link_info, content, url_data.search_depth);    
+    /*
+    Нужно описать код обработки страницы: 
+        - извлечение ссылок и их обработка
+        - 
     
-    std::cout << "Completed: " << url_link->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
+    */
+    std::cout << "Completed: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
+
+
+
+    // Добавление извлеченных ссылок в очердь ссылок
 
 }
 
@@ -173,7 +183,7 @@ std::string webCrawler::downloadPage(const std::string &url)
 }
 
 
-void webCrawler::processPage(const std::string& url, const std::string& content, int current_depth) 
+void webCrawler::processPage(const std::optional<Link>& url, const std::string& content, int current_depth) 
 {
     // Код обработки данных на странице
 }
