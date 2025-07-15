@@ -23,7 +23,8 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE CrawlerDaemon 
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+        CrawlerDaemon
 # IniParser SafeThreadPool
 )
 

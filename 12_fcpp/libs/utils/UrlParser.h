@@ -34,6 +34,8 @@ struct Link
 		query = l.query;
 		link = l.link;
 		adress = l.adress;	
+
+		return *this;
 	}
 };
 

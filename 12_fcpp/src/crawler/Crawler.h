@@ -23,11 +23,11 @@ struct UrlInfo
 {
     std::optional<Link> url_link_info;
     // std::string address;
-	int	search_depth = 1;
+	int	search_depth = 1; // Deafault depth search
 
     UrlInfo() = default;
     UrlInfo(const std::string& addr, int depth) {
-        url_link_info = URLParser::parse(addr);
+        url_link_info = URLParser::parse(addr); // Если передается строка в конструктор, то сразу парсим
         search_depth = depth;        
     }
     UrlInfo(const std::optional<Link>& link, int depth) {
