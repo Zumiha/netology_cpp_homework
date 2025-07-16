@@ -1,5 +1,6 @@
 #include "Crawler.h"
 
+
 webCrawler::webCrawler(int argc, char* argv[])
 {   
     if (argv == nullptr || argc < 2) {
@@ -23,6 +24,7 @@ webCrawler::~webCrawler()
 {
     stopCrawling();
     // а деструктор ThreadPool соединит потоки
+    std::cout << "Crawling completed!" << std::endl;
 }
 
 void webCrawler::startCrawling()
@@ -82,9 +84,6 @@ void webCrawler::startCrawling()
     
     is_running.store(false);
     
-    std::cout << "Crawling completed!" << std::endl;
-    std::cout << "Total pages crawled: " << total_pages_crawled.load() << std::endl;
-    std::cout << "Total words indexed: " << total_words_indexed.load() << std::endl;    
 }
 
 void webCrawler::stopCrawling()
@@ -151,35 +150,31 @@ void webCrawler::crawlUrl(UrlInfo url_data)
     }
 
     // Download page content
-    std::string content = downloadPage(url_data.url_link_info->adress);
+    HTTPUtils::Config config;
+    std::string content = HTTPUtils::fetchPage(url_data.url_link_info.value(), config).value();
+
     if (content.empty()) {
         std::cout << "Failed to download: " << url_data.url_link_info->adress << std::endl;
         return;
     }
 
     total_pages_crawled++;
-
+    
     // Обработка страницы
     processPage(url_data.url_link_info, content, url_data.search_depth);    
     /*
     Нужно описать код обработки страницы: 
-        - извлечение ссылок и их обработка
-        - 
+    - извлечение ссылок и их обработка
+    - 
     
     */
-    std::cout << "Completed: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
-
+   std::cout << "Completed: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
+   std::cout << "Total pages crawled: " << total_pages_crawled.load() << std::endl;
+   std::cout << "Total words indexed: " << total_words_indexed.load() << std::endl;    
 
 
     // Добавление извлеченных ссылок в очердь ссылок
 
-}
-
-
-std::string webCrawler::downloadPage(const std::string &url)
-{
-    // Код для загрузки страницы
-    return url;
 }
 
 

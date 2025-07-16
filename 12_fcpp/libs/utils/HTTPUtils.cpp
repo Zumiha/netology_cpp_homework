@@ -50,9 +50,10 @@ std::optional<std::string> HTTPUtils::fetchPage(const Link& url, const Config& c
         if (url.protocol == ProtocolType::HTTPS) {
             // HTTPS implementation
             ssl::context ctx(ssl::context::tlsv12_client);
-            ctx.set_default_verify_paths();
+            // ctx.set_default_verify_paths();
             
             if (config.verifySSL) {
+                ctx.set_default_verify_paths();
                 ctx.set_verify_mode(ssl::verify_peer);
             } else {
                 ctx.set_verify_mode(ssl::verify_none);
@@ -76,8 +77,14 @@ std::optional<std::string> HTTPUtils::fetchPage(const Link& url, const Config& c
             beast::get_lowest_layer(stream).connect(results);
             
             // Perform SSL handshake
-            stream.handshake(ssl::stream_base::client);
-            
+// stream.handshake(ssl::stream_base::client);
+            beast::error_code handshake_ec;
+            stream.handshake(ssl::stream_base::client, handshake_ec);
+            if (handshake_ec) {
+                std::cerr << "SSL handshake failed: " << handshake_ec.message() << std::endl;
+                return std::nullopt;
+            }
+
             // Set up HTTP request
             http::request<http::empty_body> req{http::verb::get, url.query, 11};
             req.set(http::field::host, url.hostName);
@@ -85,12 +92,24 @@ std::optional<std::string> HTTPUtils::fetchPage(const Link& url, const Config& c
             req.set(http::field::connection, "close");
             
             // Send request
-            http::write(stream, req);
+// http::write(stream, req);
+            beast::error_code write_ec;
+            http::write(stream, req, write_ec);
+            if (write_ec) {
+                std::cerr << "Failed to write request: " << write_ec.message() << std::endl;
+                return std::nullopt;
+            }
             
             // Read response
             beast::flat_buffer buffer;
             http::response<http::dynamic_body> res;
-            http::read(stream, buffer, res);
+// http::read(stream, buffer, res);
+            beast::error_code read_ec;
+            http::read(stream, buffer, res, read_ec);
+            if (read_ec) {
+                std::cerr << "Failed to read response: " << read_ec.message() << std::endl;
+                return std::nullopt;
+            }
             
             // Convert response body to string
             std::string content = beast::buffers_to_string(res.body().data());

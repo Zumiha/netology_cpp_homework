@@ -24,6 +24,8 @@ if(NOT BOOST_FILESYSTEM_LIB)
     message(FATAL_ERROR "No filesystem library found in ${BOOST_ROOT}/stage/lib")
 endif()
 
+# Find OpenSSL
+# find_package(OpenSSL REQUIRED)
 
 
 set(SOURCE_LIB UrlParser.cpp HTTPUtils.cpp)
@@ -34,9 +36,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${BOOST_ROOT}")
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     ${BOOST_SYSTEM_LIB}
     ${BOOST_FILESYSTEM_LIB}
+    ssl
+    crypto
     ws2_32
     wsock32
 )
 
 message(STATUS "Linking with system: ${BOOST_SYSTEM_LIB}")
 message(STATUS "Linking with filesystem: ${BOOST_FILESYSTEM_LIB}")
+message(STATUS "OpenSSL SSL: ${OPENSSL_SSL_LIBRARY}")
+message(STATUS "OpenSSL Crypto: ${OPENSSL_CRYPTO_LIBRARY}")

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <unordered_set>
+#include <optional>
 
 #include <regex>
 #include <algorithm>
@@ -10,6 +11,7 @@
 #include "IniParser.h"
 #include "ThreadPool.h"
 #include "UrlParser.h"
+#include "HTTPUtils.h"
 
 struct DbInfo {
     std::string host;
@@ -54,7 +56,7 @@ public:
     webCrawler(int argc, char* argv[]);
     ~webCrawler();
     
-
+    CrawlParams params_getter() {return this->search_settings;};
 
     void startCrawling();
     void stopCrawling();
@@ -100,8 +102,4 @@ private:
     // Statistics
     std::atomic<int> total_pages_crawled{0};
     std::atomic<int> total_words_indexed{0};
-    
-    // // Synchronization
-    // std::condition_variable completion_cv;
-    // std::mutex completion_mutex;
 };
