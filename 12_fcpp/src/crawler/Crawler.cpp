@@ -81,6 +81,8 @@ void webCrawler::startCrawling()
            // Нет задач, короткое ожидание
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // without sleep premature destructor call. why? who knows.
 
         // std::cout << "\nshould stop? - " << should_stop.load();
         // std::cout << "\nactive workers: " << active_workers.load();
@@ -189,14 +191,10 @@ void webCrawler::crawlUrl(UrlInfo url_data)
 
     // Добавление извлеченных ссылок в очердь ссылок если не достигли максимальной глубины поиска    
     {   
-        // std::cout << "lock mutex\n";
         std::lock_guard<std::mutex> lock(visited_mutex);
-        // std::cout << "check depth\n";
         if (url_data.search_depth < search_settings.search_depth_max) {
-            // std::cout << "depth ok adding links\n";
             for (const auto& link : new_links) {
                 if (visited_urls.find(link.url_link_info->adress) == visited_urls.end()) {
-                    // std::cout << "new link: " << link.url_link_info->adress << std::endl;
                     pending_urls.push(link);
                     std::lock_guard<std::mutex> lock(count_mutex);
                     pending_count++;
@@ -204,7 +202,6 @@ void webCrawler::crawlUrl(UrlInfo url_data)
                 }
             }
         }
-        // std::cout << "unlock mutex\n";
     }
 
     std::cout << "check pending url size: " << pending_urls.size() << std::endl;
