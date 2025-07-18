@@ -45,7 +45,10 @@ void webCrawler::startCrawling()
     // Добавляем начальную ссылку в очередь ссылок
     UrlInfo initial_url(this->search_settings.url.url_link_info, 1);
     pending_urls.push(initial_url);
-    pending_count++;
+    {
+        std::lock_guard<std::mutex> lock(count_mutex);
+        pending_count++;
+    }
     
     // Рабочий цикл используя ThreadPool
     while   (   !should_stop.load() &&                                      // Пока НЕ сказано остановиться
@@ -55,7 +58,10 @@ void webCrawler::startCrawling()
     {        
         UrlInfo url_data;
         if (pending_urls.pop(url_data)) { // Если в очереди ссылок есть ссылки, то передаем из стопки в url_data 
-            pending_count--;
+            {
+                std::lock_guard<std::mutex> lock(count_mutex);
+                pending_count--;
+            }
             
             // Добавляем задачи краулера в ThreadPool
             work_pool->submit([this, url_data]() {
@@ -75,6 +81,16 @@ void webCrawler::startCrawling()
            // Нет задач, короткое ожидание
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+
+        // std::cout << "\nshould stop? - " << should_stop.load();
+        // std::cout << "\nactive workers: " << active_workers.load();
+        // {
+        //     std::lock_guard<std::mutex> lock(count_mutex);
+        //     std::cout << "\npending count: " << pending_count.load();
+        // }
+        // std::cout << "\npage limit?: " << (total_pages_crawled.load() > search_settings.max_pages);
+        // std::cout << std::endl;
+
     }
     
     // Wait for all active workers to finish
@@ -166,22 +182,34 @@ void webCrawler::crawlUrl(UrlInfo url_data)
     std::vector<UrlInfo> new_links = parsed_content->discovered_urls; // links to add 
     std::string page_text = parsed_content->body_text; // text extracted from page
 
-    std::cout << "Completed: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
+    std::cout << "\n\nCompleted: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
     std::cout << "Total pages crawled: " << total_pages_crawled.load() << std::endl;
     std::cout << "Total words indexed: " << total_words_indexed.load() << std::endl;    
 
 
     // Добавление извлеченных ссылок в очердь ссылок если не достигли максимальной глубины поиска    
     {   
+        // std::cout << "lock mutex\n";
         std::lock_guard<std::mutex> lock(visited_mutex);
-        if (url_data.search_depth <= search_settings.search_depth_max) {
+        // std::cout << "check depth\n";
+        if (url_data.search_depth < search_settings.search_depth_max) {
+            // std::cout << "depth ok adding links\n";
             for (const auto& link : new_links) {
                 if (visited_urls.find(link.url_link_info->adress) == visited_urls.end()) {
+                    // std::cout << "new link: " << link.url_link_info->adress << std::endl;
                     pending_urls.push(link);
+                    std::lock_guard<std::mutex> lock(count_mutex);
+                    pending_count++;
+                    std::cout << "pending urls count: " << pending_count.load() << std::endl;
                 }
             }
         }
+        // std::cout << "unlock mutex\n";
     }
+
+    std::cout << "check pending url size: " << pending_urls.size() << std::endl;
+    std::cout << "check pending url empty: " << pending_urls.empty() << std::endl;
+    std::cout << std::endl;
 
 }
 

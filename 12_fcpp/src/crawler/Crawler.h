@@ -36,13 +36,8 @@ protected:
     
 private:
     void crawlUrl(UrlInfo url_data);
-
-    std::string downloadPage(const std::string& url);
-    void processPage(const std::optional<Link>& url, const std::string& content, int current_depth);
-    void extractLinks(const std::string& content, const std::string& base_url, int current_depth);
+    
     void indexWords(const std::string& content, const std::string& url);
-    std::string normalizeUrl(const std::string& url, const std::string& base_url);
-    bool isValidUrl(const std::string& url);
     
     // Configuration
     CrawlParams search_settings;
@@ -66,4 +61,5 @@ private:
     // Statistics
     std::atomic<int> total_pages_crawled{0};
     std::atomic<int> total_words_indexed{0};
+    std::mutex count_mutex;
 };

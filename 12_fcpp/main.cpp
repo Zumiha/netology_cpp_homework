@@ -3,7 +3,7 @@
 int main(int argc, char* argv[]) {   
     try {
         webCrawler spider(argc, argv);
-        spider.printSettings();  
+        // spider.printSettings();  
         spider.startCrawling();
 
     }
