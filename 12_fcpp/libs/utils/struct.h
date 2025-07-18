@@ -38,6 +38,7 @@ struct CrawlParams
 {
     DbInfo db_connection;
     UrlInfo url;
+	int search_depth_max = 1;
 	int	word_length_min = 3;
 	int	word_length_max = 32;
 	int thread_max = 0;

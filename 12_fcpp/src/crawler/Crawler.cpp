@@ -103,7 +103,7 @@ void webCrawler::printSettings()
     std::cout << this->search_settings.db_connection.user << "\n";
     std::cout << this->search_settings.db_connection.password << "\n";
 
-    std::cout << this->search_settings.url.search_depth << "\n";
+    std::cout << this->search_settings.search_depth_max << "\n";
     std::cout << this->search_settings.word_length_min << "\n";
     std::cout << this->search_settings.word_length_max << "\n";
 
@@ -113,7 +113,7 @@ void webCrawler::printSettings()
 void webCrawler::setSearchSettings()
 {
     this->search_settings.url.url_link_info = URLParser::parse(this->parser->getValue<std::string>("url.urltest"));
-    this->search_settings.url.search_depth = this->parser->getValue<int>("indexing.search_depth");
+    this->search_settings.search_depth_max = this->parser->getValue<int>("indexing.search_depth");
 
 
     this->search_settings.db_connection.host = this->parser->getValue<std::string>("db.host");
@@ -160,48 +160,32 @@ void webCrawler::crawlUrl(UrlInfo url_data)
 
     total_pages_crawled++;
     
-    // Обработка страницы
-    processPage(url_data.url_link_info, content, url_data.search_depth);    
-    /*
-    Нужно описать код обработки страницы: 
-    - извлечение ссылок и их обработка
-    - 
-    
-    */
+    // Обработка страницы в структуру ParsedContent, в которой есть отформатированные ссылки и текст со станицы
+    auto parsed_content = HtmlParser::processHtml(content, url_data.url_link_info.value(), url_data.search_depth);
+
+    std::vector<UrlInfo> new_links = parsed_content->discovered_urls; // links to add 
+    std::string page_text = parsed_content->body_text; // text extracted from page
+
     std::cout << "Completed: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
     std::cout << "Total pages crawled: " << total_pages_crawled.load() << std::endl;
     std::cout << "Total words indexed: " << total_words_indexed.load() << std::endl;    
 
 
-    // Добавление извлеченных ссылок в очердь ссылок
+    // Добавление извлеченных ссылок в очердь ссылок если не достигли максимальной глубины поиска    
+    {   
+        std::lock_guard<std::mutex> lock(visited_mutex);
+        if (url_data.search_depth <= search_settings.search_depth_max) {
+            for (const auto& link : new_links) {
+                if (visited_urls.find(link.url_link_info->adress) == visited_urls.end()) {
+                    pending_urls.push(link);
+                }
+            }
+        }
+    }
 
 }
-
-
-void webCrawler::processPage(const std::optional<Link>& url, const std::string& content, int current_depth) 
-{
-    // Код обработки данных на странице
-}
-
-void webCrawler::extractLinks(const std::string& content, const std::string& base_url, int current_depth) 
-{
-    // Код получения ссылок на странице
-}
-
 
 void webCrawler::indexWords(const std::string& content, const std::string& url) 
 {
     // Код индексирования слов на странице
-}
-
-std::string webCrawler::normalizeUrl(const std::string& url, const std::string& base_url) 
-{
-    // Код приведения формата ссылки
-    return url;
-}
-
-bool webCrawler::isValidUrl(const std::string& url) 
-{
-    // Проверка валидности ссылки
-    return false;
 }
