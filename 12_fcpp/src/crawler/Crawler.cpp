@@ -168,9 +168,9 @@ void webCrawler::crawlUrl(UrlInfo url_data)
     - 
     
     */
-   std::cout << "Completed: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
-   std::cout << "Total pages crawled: " << total_pages_crawled.load() << std::endl;
-   std::cout << "Total words indexed: " << total_words_indexed.load() << std::endl;    
+    std::cout << "Completed: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
+    std::cout << "Total pages crawled: " << total_pages_crawled.load() << std::endl;
+    std::cout << "Total words indexed: " << total_words_indexed.load() << std::endl;    
 
 
     // Добавление извлеченных ссылок в очердь ссылок

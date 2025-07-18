@@ -28,8 +28,8 @@ endif()
 # find_package(OpenSSL REQUIRED)
 
 
-set(SOURCE_LIB UrlParser.cpp HTTPUtils.cpp)
-set(SOURCE_HD UrlParser.h HTTPUtils.h)
+set(SOURCE_LIB UrlParser.cpp HTTPUtils.cpp HtmlParser.cpp)
+set(SOURCE_HD struct.h UrlParser.h HTTPUtils.h HtmlParser.h)
 add_library(${PROJECT_NAME} STATIC ${SOURCE_LIB} ${SOURCE_HD})
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${BOOST_ROOT}")
