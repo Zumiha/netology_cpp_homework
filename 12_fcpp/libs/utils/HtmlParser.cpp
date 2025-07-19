@@ -101,7 +101,8 @@ std::optional<ParsedContent> HtmlParser::processHtml(const std::optional<std::st
     // Extract and clean body text
     std::string text = stripHtmlTags(html);
     result.body_text = normalizeText(text);
-    
+    result.page_link = base_link.adress;
+
     return result;
 }
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <unordered_set>
 #include <optional>
 
@@ -62,4 +61,7 @@ private:
     std::atomic<int> total_pages_crawled{0};
     std::atomic<int> total_words_indexed{0};
     std::mutex count_mutex;
+
+    //Tests
+    SafeQueue<std::string> page_text;
 };

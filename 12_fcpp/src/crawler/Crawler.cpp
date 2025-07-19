@@ -39,11 +39,11 @@ void webCrawler::startCrawling()
     
     std::cout << "Starting web crawling..." << std::endl;
     std::cout << "Initial URL: " << search_settings.url.url_link_info->link << std::endl;
-    std::cout << "Max depth: " << search_settings.url.search_depth << std::endl;
-    std::cout << "Max pages: " << search_settings.max_pages << std::endl;
+    std::cout << "Max depth: " << search_settings.search_depth_max << std::endl;
+    std::cout << "Max pages: " << search_settings.max_pages << "\n" << std::endl;
     
     // Добавляем начальную ссылку в очередь ссылок
-    UrlInfo initial_url(this->search_settings.url.url_link_info, 1);
+    UrlInfo initial_url(this->search_settings.url.url_link_info, 0);
     pending_urls.push(initial_url);
     {
         std::lock_guard<std::mutex> lock(count_mutex);
@@ -108,6 +108,18 @@ void webCrawler::stopCrawling()
 {  
     should_stop.store(true);
     is_running.store(false);
+
+    // std::cout << "\n\nText from pages:\n";
+    // bool queue_not_empty = {true};
+    // int i = 0;
+    // std::string text;
+    // while (queue_not_empty) {   
+    //     queue_not_empty = page_text.pop(text);
+    //     if (!queue_not_empty) break;
+    //     i++;
+    //     std::cout << "\nPage " << i << " text:\n";
+    //     std::cout << text << std::endl;
+    // } 
 }
 
 void webCrawler::printSettings()
@@ -142,6 +154,7 @@ void webCrawler::setSearchSettings()
     
     this->search_settings.word_length_min = this->parser->getValue<int>("indexing.word_length_min");
     this->search_settings.word_length_max = this->parser->getValue<int>("indexing.word_length_max");
+    this->search_settings.max_pages = this->parser->getValue<int>("indexing.max_pages");
 
     this->search_settings.thread_max = this->parser->getValue<int>("threading.thread_max");
 }
@@ -167,7 +180,7 @@ void webCrawler::crawlUrl(UrlInfo url_data)
         return;
     }
 
-    // Download page content
+    // Загрузка страницы
     HTTPUtils::Config config;
     std::string content = HTTPUtils::fetchPage(url_data.url_link_info.value(), config).value();
 
@@ -182,9 +195,9 @@ void webCrawler::crawlUrl(UrlInfo url_data)
     auto parsed_content = HtmlParser::processHtml(content, url_data.url_link_info.value(), url_data.search_depth);
 
     std::vector<UrlInfo> new_links = parsed_content->discovered_urls; // links to add 
-    std::string page_text = parsed_content->body_text; // text extracted from page
+    page_text.push(parsed_content->body_text); // text extracted from page add to safequeue
 
-    std::cout << "\n\nCompleted: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
+    std::cout << "Completed: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
     std::cout << "Total pages crawled: " << total_pages_crawled.load() << std::endl;
     std::cout << "Total words indexed: " << total_words_indexed.load() << std::endl;    
 

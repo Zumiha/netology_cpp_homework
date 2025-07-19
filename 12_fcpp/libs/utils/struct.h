@@ -2,6 +2,7 @@
 
 #include <string>
 #include <optional>
+#include <memory>
 
 #include "UrlParser.h"
 
@@ -17,7 +18,7 @@ struct UrlInfo
 {
     std::optional<Link> url_link_info; 
     // std::string address;
-	int	search_depth = 1; // Deafault depth search
+	int	search_depth = 0; // Deafault depth search
 
     UrlInfo() = default;
     UrlInfo(const std::string& addr, int depth) {
@@ -43,7 +44,7 @@ struct CrawlParams
 	int	word_length_max = 32;
 	int thread_max = 0;
 
-    int max_pages = 1000;  // Ограничение на количество посещаемых страниц
+    int max_pages = 100;  // Ограничение на количество посещаемых страниц
     int timeout_seconds = 30;  // Request timeout
 };
 

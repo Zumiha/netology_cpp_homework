@@ -8,6 +8,7 @@
 #include "struct.h"
 
 struct ParsedContent {
+    std::string page_link;                    // Ссылка обрабатываемой страницы 
     std::vector<UrlInfo> discovered_urls;     // URLs found in the HTML, ready for crawling
     std::vector<std::string> raw_links;       // Oригинальные ссылки (для статистики, дебагинга и пр.)
     std::string body_text;
