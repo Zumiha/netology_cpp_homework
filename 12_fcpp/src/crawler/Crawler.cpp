@@ -45,10 +45,7 @@ void webCrawler::startCrawling()
     // Добавляем начальную ссылку в очередь ссылок
     UrlInfo initial_url(this->search_settings.url.url_link_info, 0);
     pending_urls.push(initial_url);
-    {
-        std::lock_guard<std::mutex> lock(count_mutex);
-        pending_count++;
-    }
+    pending_count++;
     
     // Рабочий цикл используя ThreadPool
     while   (   !should_stop.load() &&                                      // Пока НЕ сказано остановиться
@@ -58,10 +55,9 @@ void webCrawler::startCrawling()
     {        
         UrlInfo url_data;
         if (pending_urls.pop(url_data)) { // Если в очереди ссылок есть ссылки, то передаем из стопки в url_data 
-            {
-                std::lock_guard<std::mutex> lock(count_mutex);
-                pending_count--;
-            }
+            // std::cout << "How many pending url left 1: " << pending_count.load() << std::endl;
+            pending_count--; 
+            // std::cout << "How many pending url left 2: " << pending_count.load() << std::endl;
             
             // Добавляем задачи краулера в ThreadPool
             work_pool->submit([this, url_data]() {
@@ -86,10 +82,7 @@ void webCrawler::startCrawling()
 
         // std::cout << "\nshould stop? - " << should_stop.load();
         // std::cout << "\nactive workers: " << active_workers.load();
-        // {
-        //     std::lock_guard<std::mutex> lock(count_mutex);
-        //     std::cout << "\npending count: " << pending_count.load();
-        // }
+        // std::cout << "\npending count: " << pending_count.load();
         // std::cout << "\npage limit?: " << (total_pages_crawled.load() > search_settings.max_pages);
         // std::cout << std::endl;
 
@@ -99,7 +92,7 @@ void webCrawler::startCrawling()
     while (active_workers.load() > 0) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    
+
     is_running.store(false);
     
 }
@@ -209,15 +202,12 @@ void webCrawler::crawlUrl(UrlInfo url_data)
             for (const auto& link : new_links) {
                 if (visited_urls.find(link.url_link_info->adress) == visited_urls.end()) {
                     pending_urls.push(link);
-                    std::lock_guard<std::mutex> lock(count_mutex);
-                    pending_count++;
-                    std::cout << "pending urls count: " << pending_count.load() << std::endl;
+                    // pending_count++; std::cout << "pending urls count: " << pending_count.load() << std::endl;
                 }
             }
         }
     }
 
-    std::cout << "check pending url size: " << pending_urls.size() << std::endl;
     std::cout << "check pending url empty: " << pending_urls.empty() << std::endl;
     std::cout << std::endl;
 
