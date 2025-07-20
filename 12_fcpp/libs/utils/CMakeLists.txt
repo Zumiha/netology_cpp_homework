@@ -34,8 +34,8 @@ endif()
 # find_package(OpenSSL REQUIRED)
 
 
-set(SOURCE_LIB UrlParser.cpp HTTPUtils.cpp HtmlParser.cpp)
-set(SOURCE_HD struct.h UrlParser.h HTTPUtils.h HtmlParser.h)
+set(SOURCE_LIB UrlParser.cpp HTTPUtils.cpp HtmlParser.cpp Indexer.cpp)
+set(SOURCE_HD struct.h UrlParser.h HTTPUtils.h HtmlParser.h Indexer.h)
 add_library(${PROJECT_NAME} STATIC ${SOURCE_LIB} ${SOURCE_HD})
 
 target_include_directories(${PROJECT_NAME} PRIVATE "${BOOST_ROOT}")
