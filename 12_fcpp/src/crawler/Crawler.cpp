@@ -187,8 +187,12 @@ void webCrawler::crawlUrl(UrlInfo url_data)
     // Обработка страницы в структуру ParsedContent, в которой есть отформатированные ссылки и текст со станицы
     auto parsed_content = HtmlParser::processHtml(content, url_data.url_link_info.value(), url_data.search_depth);
 
-    std::vector<UrlInfo> new_links = parsed_content->discovered_urls; // links to add 
-    page_text.push(parsed_content->body_text); // text extracted from page add to safequeue
+    TextIndexer indexer; // Индексация слов
+    indexer.indexContent(parsed_content->body_text); 
+    auto frequencies = indexer.getWordFrequenciesSorted(); 
+    auto page_adress = url_data.url_link_info->adress; // Адрес страницы 
+    
+    auto sql_req = indexer.prepareSqlInsertStatement();
 
     std::cout << "Completed: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
     std::cout << "Total pages crawled: " << total_pages_crawled.load() << std::endl;
@@ -199,7 +203,7 @@ void webCrawler::crawlUrl(UrlInfo url_data)
     {   
         std::lock_guard<std::mutex> lock(visited_mutex);
         if (url_data.search_depth < search_settings.search_depth_max) {
-            for (const auto& link : new_links) {
+            for (const auto& link : parsed_content->discovered_urls) {
                 if (visited_urls.find(link.url_link_info->adress) == visited_urls.end()) {
                     pending_urls.push(link);
                     // pending_count++; std::cout << "pending urls count: " << pending_count.load() << std::endl;

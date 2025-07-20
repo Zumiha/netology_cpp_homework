@@ -13,6 +13,7 @@
 #include "UrlParser.h"
 #include "HTTPUtils.h"
 #include "HtmlParser.h"
+#include "Indexer.h"
 
 class webCrawler {
 public:
@@ -61,6 +62,9 @@ private:
     std::atomic<int> total_pages_crawled{0};
     std::atomic<int> total_words_indexed{0};
     std::mutex count_mutex;
+
+    // Indexer
+    // std::unique_ptr<TextIndexer> Indexer;
 
     //Tests
     SafeQueue<std::string> page_text;
