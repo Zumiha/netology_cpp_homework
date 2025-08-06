@@ -6,14 +6,9 @@
 #include <utility>
 #include <boost/locale.hpp>
 
+#include "struct.h"
+
 class TextIndexer {
-public:
-    struct WordFrequency {
-        std::string word;
-        size_t frequency;
-        
-        WordFrequency(const std::string& w, size_t f) : word(w), frequency(f) {};
-    };
 
 private:
     std::unordered_map<std::string, size_t> word_frequencies_;
@@ -31,8 +26,8 @@ public:
     void clear(); // Очищение всех данных из word_frequencies_
 
 
-    std::vector<WordFrequency> getWordFrequencies() const; // Слова из word_frequencies_ подготавливаются в вектор
-    std::vector<WordFrequency> getWordFrequenciesSorted() const; // Сортировка слов в векторе
+    std::vector<Indexing::WordFrequency> getWordFrequencies() const; // Слова из word_frequencies_ подготавливаются в вектор
+    std::vector<Indexing::WordFrequency> getWordFrequenciesSorted() const; // Сортировка слов в векторе
 
     // Для статистики
     size_t getUniqueWordCount() const; // Кол-во уникальных слов

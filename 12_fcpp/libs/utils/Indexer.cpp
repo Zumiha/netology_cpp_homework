@@ -24,8 +24,8 @@ void TextIndexer::clear() {
     word_frequencies_.clear();
 }
 
-std::vector<TextIndexer::WordFrequency> TextIndexer::getWordFrequencies() const {
-    std::vector<WordFrequency> result;
+std::vector<Indexing::WordFrequency> TextIndexer::getWordFrequencies() const {
+    std::vector<Indexing::WordFrequency> result;
     result.reserve(word_frequencies_.size());
     
     for (const auto& pair : word_frequencies_) {
@@ -35,11 +35,11 @@ std::vector<TextIndexer::WordFrequency> TextIndexer::getWordFrequencies() const 
     return result;
 }
 
-std::vector<TextIndexer::WordFrequency> TextIndexer::getWordFrequenciesSorted() const {
+std::vector<Indexing::WordFrequency> TextIndexer::getWordFrequenciesSorted() const {
     auto result = getWordFrequencies();
     
     std::sort(result.begin(), result.end(), 
-              [](const WordFrequency& a, const WordFrequency& b) {
+              [](const Indexing::WordFrequency& a, const Indexing::WordFrequency& b) {
                   return a.frequency > b.frequency;
               });
     

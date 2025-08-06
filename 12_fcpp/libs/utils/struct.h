@@ -6,6 +6,17 @@
 
 #include "UrlParser.h"
 
+
+namespace Indexing {
+    struct WordFrequency {
+        std::string word;
+        size_t frequency;
+        
+        WordFrequency(const std::string& w, size_t f) : word(w), frequency(f) {};
+    };
+}
+
+
 struct DbInfo {
     std::string host;
     std::string port;
