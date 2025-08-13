@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cctype>
 #include <unordered_set>
+#include <unordered_map>
 #include <cstdio>
 
 std::string HtmlParser::stripHtmlTags(const std::string& html) {
@@ -22,12 +23,7 @@ std::string HtmlParser::stripHtmlTags(const std::string& html) {
     result = std::regex_replace(result, tag_regex, " ");
     
     // Decode common HTML entities
-    result = std::regex_replace(result, std::regex("&amp;"), "&");
-    result = std::regex_replace(result, std::regex("&lt;"), "<");
-    result = std::regex_replace(result, std::regex("&gt;"), ">");
-    result = std::regex_replace(result, std::regex("&quot;"), "\"");
-    result = std::regex_replace(result, std::regex("&apos;"), "'");
-    result = std::regex_replace(result, std::regex("&nbsp;"), " ");
+    result = decodeHtmlEntities(result);
     
     return result;
 }
@@ -82,6 +78,88 @@ std::vector<std::string> HtmlParser::extractLinks(const std::string& html) {
     return links;
 }
 
+std::string HtmlParser::getTitle(const std::string& html) {
+    std::regex title_regex("<title[^>]*>([^<]*)</title>", std::regex_constants::icase);
+    std::smatch matches;
+    
+    if (std::regex_search(html, matches, title_regex)) {
+        std::string title = matches[1].str();
+        
+        title = decodeHtmlEntities(title);        
+        title = normalizeText(title); 
+        return title;
+    }
+    
+    return "";  // Return empty string if no title found
+}
+
+std::string HtmlParser::decodeHtmlEntities(const std::string &text)
+{
+static const std::unordered_map<std::string, std::string> html_entities = {
+        {"&amp;", "&"},
+        {"&lt;", "<"},
+        {"&gt;", ">"},
+        {"&quot;", "\""},
+        {"&apos;", "'"},
+        {"&#39;", "'"},
+        {"&nbsp;", " "},
+        {"&copy;", "©"},
+        {"&reg;", "®"},
+        {"&trade;", "™"},
+        {"&hellip;", "…"},
+        {"&mdash;", "—"},
+        {"&ndash;", "–"},
+        {"&lsquo;", "'"},
+        {"&rsquo;", "'"},
+        {"&ldquo;", "\""},
+        {"&rdquo;", "\""},
+        {"&bull;", "•"}
+    };
+    
+    std::string result = text;
+    
+    // Replace named entities
+    for (const auto& entity : html_entities) {
+        size_t pos = 0;
+        while ((pos = result.find(entity.first, pos)) != std::string::npos) {
+            result.replace(pos, entity.first.length(), entity.second);
+            pos += entity.second.length();
+        }
+    }
+    
+    // Handle numeric entities (&#123; and &#x1A;)
+    std::regex numeric_entity_regex(R"(&#([0-9]+);)");
+    std::regex hex_entity_regex(R"(&#x([0-9A-Fa-f]+);)");
+    
+    // Decode decimal numeric entities
+    result = std::regex_replace(result, numeric_entity_regex, [](const std::smatch& match) {
+        try {
+            int code = std::stoi(match[1].str());
+            if (code > 0 && code < 127) {  // Basic ASCII range
+                return std::string(1, static_cast<char>(code));
+            }
+            return match.str();
+        } catch (...) {
+            return match.str();
+        }
+    });
+    
+    // Decode hexadecimal numeric entities
+    result = std::regex_replace(result, hex_entity_regex, [](const std::smatch& match) {
+        try {
+            int code = std::stoi(match[1].str(), nullptr, 16);
+            if (code > 0 && code < 127) {  // Basic ASCII range
+                return std::string(1, static_cast<char>(code));
+            }
+            return match.str();
+        } catch (...) {
+            return match.str();
+        }
+    });
+    
+    return result;
+}
+
 std::optional<ParsedContent> HtmlParser::processHtml(const std::optional<std::string>& html_content, const Link& base_link, int search_depth) {
     if (!html_content.has_value() || html_content->empty()) {
         return std::nullopt;
@@ -91,6 +169,9 @@ std::optional<ParsedContent> HtmlParser::processHtml(const std::optional<std::st
     
     ParsedContent result;
     
+    // Extract page title
+    result.page_title = getTitle(html);
+
     // Extract links first (before removing tags)
     result.raw_links = extractLinks(html);
 
