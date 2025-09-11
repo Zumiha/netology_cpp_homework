@@ -39,7 +39,7 @@ std::optional<std::string> HTTPUtils::fetchPage(const Link& url, const Config& c
 bool HTTPUtils::isTextContent(const std::string& content) {
     if (content.empty()) return false;
     
-    // Check for null bytes in first 1024 characters (or full content if shorter)
+    // Наличие нулевых байтов в первых 1024 символах (или во всем содержимом, если оно короче).
     size_t checkLength = std::min(content.length(), size_t(1024));
     for (size_t i = 0; i < checkLength; ++i) {
         if (content[i] == '\0') {
@@ -47,7 +47,7 @@ bool HTTPUtils::isTextContent(const std::string& content) {
         }
     }
     
-    // Count printable characters
+    // Количество печатных символов
     size_t printableCount = 0;
     for (size_t i = 0; i < checkLength; ++i) {
         if (std::isprint(static_cast<unsigned char>(content[i])) || 
@@ -56,7 +56,7 @@ bool HTTPUtils::isTextContent(const std::string& content) {
         }
     }
     
-    // Consider it text if at least 95% of characters are printable
+    // Если не менее 95% символов читаемые, считать текстом
     return (printableCount * 100 / checkLength) >= 95;
 }
 
