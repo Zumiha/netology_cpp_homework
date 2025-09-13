@@ -7,7 +7,6 @@
 #include <unordered_map>
 #include <cstdio>
 
-
 std::string HtmlParser::decodeHtmlEntities(const std::string &text)
 {
 static const std::unordered_map<std::string, std::string> html_entities = {
@@ -43,35 +42,56 @@ static const std::unordered_map<std::string, std::string> html_entities = {
     }
     
     // Обработка числовых сущностей (&#123; и &#x1A;)
-    std::regex numeric_entity_regex(R"(&#([0-9]+);)");
-    std::regex hex_entity_regex(R"(&#x([0-9A-Fa-f]+);)");
+    static const std::regex numeric_entity_regex(R"(&#([0-9]+);)");
+    static const std::regex hex_entity_regex(R"(&#x([0-9A-Fa-f]+);)");
     
     // Десятичные числовые сущности
-    result = std::regex_replace(result, numeric_entity_regex, [](const std::smatch& match) {
+    std::sregex_iterator iter(result.begin(), result.end(), numeric_entity_regex);
+    std::sregex_iterator end;
+
+    std::vector<std::pair<size_t, std::pair<size_t, std::string>>> replacements;
+    
+    for (; iter != end; ++iter) {
+        const std::smatch& match = *iter;
         try {
             int code = std::stoi(match[1].str());
-            if (code > 0 && code < 127) {  // Базовый ASCII
-                return std::string(1, static_cast<char>(code));
+            if (code > 0 && code < 127) {
+                std::string replacement(1, static_cast<char>(code));
+                replacements.push_back({match.position(), {match.length(), replacement}});
             }
-            return match.str();
-        } catch (...) {
-            return match.str();
+        } catch (const std::exception&) {
+            // сохранить оригинал, если ошибка конвертации
         }
-    });
+    }
     
+    // Применяем замену с конца до начала
+    for (auto it = replacements.rbegin(); it != replacements.rend(); ++it) {
+        result.replace(it->first, it->second.first, it->second.second);
+    }   
+
+
     // Шестнадцатеричные числовые сущности
-    result = std::regex_replace(result, hex_entity_regex, [](const std::smatch& match) {
+    iter = std::sregex_iterator(result.begin(), result.end(), hex_entity_regex);
+    replacements.clear();
+    
+    for (; iter != end; ++iter) {
+        const std::smatch& match = *iter;
         try {
             int code = std::stoi(match[1].str(), nullptr, 16);
-            if (code > 0 && code < 127) {  // Базовый ASCII
-                return std::string(1, static_cast<char>(code));
+            if (code > 0 && code < 127) {
+                std::string replacement(1, static_cast<char>(code));
+                replacements.push_back({match.position(), {match.length(), replacement}});
             }
-            return match.str();
-        } catch (...) {
-            return match.str();
+        } catch (const std::exception&) {
+            // сохранить оригинал, если ошибка конвертации
         }
-    });
+    }
     
+    // Применяем замену с конца до начала
+    for (auto it = replacements.rbegin(); it != replacements.rend(); ++it) {
+        result.replace(it->first, it->second.first, it->second.second);
+    }
+
     return result;
 }
 
@@ -169,7 +189,7 @@ std::optional<ParsedContent> HtmlParser::processHtml(const std::optional<std::st
         // Извлечение заголовока страницы
         .page_title = getTitle(html),
         // Преобразование в абсолютные URL-адреса и создание объектов UrlInfo
-        .discovered_urls = resolveUrls(result.raw_links, base_link, search_depth + 1),
+        .discovered_urls = resolveUrls(extractLinks(html), base_link, search_depth + 1),
         // Извлечение ссылок (перед удалением тегов)
         .raw_links = extractLinks(html),
         // Извлечение и очистка текста
