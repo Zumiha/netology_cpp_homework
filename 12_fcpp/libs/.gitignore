@@ -1,0 +1,5 @@
+# exclude everything
+libpqxx/*
+
+# exception to the rule
+!libpqxx/.gitkeep 
