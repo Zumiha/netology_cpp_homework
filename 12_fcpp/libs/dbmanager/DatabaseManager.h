@@ -44,18 +44,15 @@ public:
     void closeConnection();
     
     // Операции с страницами
-    bool insertPage(const std::string& url, const std::string& title, const std::string& content);
+    std::optional<int> insertPage(const std::string& url, const std::string& title, const std::string& content);
     bool pageExists(const std::string& url);
     std::optional<int> getPageId(const std::string& url);
     
     // Операции с словами
     bool storeWordFrequencies(int page_id, const std::vector<Indexing::WordFrequency>& frequencies);
-    // bool insertWordFrequenciesBatch(const std::vector<std::tuple<int, std::string, size_t>>& batch_data);
     
     // Поисковые запросы
-    // std::vector<std::pair<std::string, int>> searchPages(const std::string& query, int limit = 10);
     std::vector<RelevanceSearchResult> searchPagesByRelevance(const std::vector<std::string>& words, bool require_all_words, int limit = 10);
-
     // std::vector<Indexing::WordFrequency> getPageWordFrequencies(int page_id);
     
     // Статистика
@@ -67,16 +64,12 @@ public:
 private:
     Config config_;
     std::unique_ptr<pqxx::connection> conn_;
-    mutable std::mutex conn_mutex_;
-    
-    std::string buildConnectionString() const;
-    bool executeTransaction(std::function<void(pqxx::work&)> transaction);
-    
+    mutable std::mutex conn_mutex_;    
+    std::string buildConnectionString() const;    
     // Запросы создания таблиц
     static const std::string CREATE_PAGES_TABLE;
     static const std::string CREATE_WORDS_TABLE;
-    static const std::string CREATE_PAGE_WORDS_TABLE;
-    // static const std::string CREATE_INDEXES;
+    // static const std::string CREATE_PAGE_WORDS_TABLE;
 };
 
 // Многопоточный пул соединений (не реализован)

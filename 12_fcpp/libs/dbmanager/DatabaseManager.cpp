@@ -190,10 +190,6 @@ bool DatabaseManager::storeWordFrequencies(int page_id, const std::vector<Indexi
     }
 }
 
-
-// bool DatabaseManager::insertWordFrequenciesBatch(const std::vector<std::tuple<int, std::string, size_t>>& batch_data) {}
-// std::vector<std::pair<std::string, int>> DatabaseManager::searchPages(const std::string& query, int limit) {}
-
 std::vector<RelevanceSearchResult> DatabaseManager::searchPagesByRelevance(const std::vector<std::string> &words, bool require_all_words, int limit)
 {
     std::vector<RelevanceSearchResult> results;
@@ -315,26 +311,6 @@ std::string DatabaseManager::buildConnectionString() const {
     return oss.str();
 }
 
-bool DatabaseManager::executeTransaction(std::function<void(pqxx::work&)> transaction) {
-    try {
-        std::lock_guard<std::mutex> lock(conn_mutex_);
-        if (!conn_ || !conn_->is_open()) {
-            if (!initialize()) {
-                return false;
-            }
-        }
-        
-        pqxx::work txn(*conn_);
-        transaction(txn);
-        txn.commit();
-        return true;
-        
-    } catch (const std::exception& e) {
-        std::cerr << "Transaction error: " << e.what() << std::endl;
-        return false;
-    }
-}
-
 // Запросы создания таблиц
 const std::string DatabaseManager::CREATE_PAGES_TABLE = R"(
     CREATE TABLE IF NOT EXISTS pages (
@@ -349,27 +325,18 @@ const std::string DatabaseManager::CREATE_WORDS_TABLE = R"(
     CREATE TABLE IF NOT EXISTS word_frequencies (
         id SERIAL PRIMARY KEY,
         page_id INTEGER REFERENCES pages(id) ON DELETE CASCADE,
-        word VARCHAR(32) NOT NULL
+        word VARCHAR(32) NOT NULL,
         frequency INTEGER NOT NULL DEFAULT 1,
         UNIQUE(page_id, word)
     )
 )";
 
-const std::string DatabaseManager::CREATE_PAGE_WORDS_TABLE = R"(
-    CREATE TABLE IF NOT EXISTS page_words (
-        id SERIAL PRIMARY KEY,
-        page_id INTEGER REFERENCES pages(id) ON DELETE CASCADE,
-        word_id INTEGER REFERENCES words(id) ON DELETE CASCADE,
-        frequency INTEGER NOT NULL DEFAULT 1,
-        UNIQUE(page_id, word_id)
-    )
-)";
-
-// const std::string DatabaseManager::CREATE_INDEXES = R"(
-//     CREATE INDEX IF NOT EXISTS idx_pages_url ON pages(url);
-//     CREATE INDEX IF NOT EXISTS idx_pages_crawled_at ON pages(crawled_at);
-//     CREATE INDEX IF NOT EXISTS idx_words_word ON words(word);
-//     CREATE INDEX IF NOT EXISTS idx_page_words_page_id ON page_words(page_id);
-//     CREATE INDEX IF NOT EXISTS idx_page_words_word_id ON page_words(word_id);
-//     CREATE INDEX IF NOT EXISTS idx_page_words_frequency ON page_words(frequency);
+// const std::string DatabaseManager::CREATE_PAGE_WORDS_TABLE = R"(
+//     CREATE TABLE IF NOT EXISTS page_words (
+//         id SERIAL PRIMARY KEY,
+//         page_id INTEGER REFERENCES pages(id) ON DELETE CASCADE,
+//         word_id INTEGER REFERENCES words(id) ON DELETE CASCADE,
+//         frequency INTEGER NOT NULL DEFAULT 1,
+//         UNIQUE(page_id, word_id)
+//     )
 // )";

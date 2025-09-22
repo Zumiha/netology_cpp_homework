@@ -1,6 +1,5 @@
 #include "Crawler.h"
 
-
 webCrawler::webCrawler(int argc, char* argv[])
 {   
     if (argv == nullptr || argc < 2) {
