@@ -40,4 +40,4 @@ private:
     void workerLoop(size_t worker_id);
     bool processBatch(DatabaseManager& db, std::vector<CrawlResult>& batch);
 
-}   
+};   

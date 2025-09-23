@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 # Source files
-set(SOURCE_LIB DatabaseManager.cpp)
-set(SOURCE_HD DatabaseManager.h)
+set(SOURCE_LIB DatabaseManager.cpp DatabaseManager.cpp)
+set(SOURCE_HD DatabaseManager.h DatabaseManager.h)
 
 # Find libpqxx
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../libpqxx)
@@ -18,9 +18,14 @@ endif()
 add_library(DatabaseManager STATIC ${SOURCE_LIB} ${SOURCE_HD})
 
 target_compile_features(DatabaseManager PRIVATE cxx_std_17)
-target_link_libraries(DatabaseManager PUBLIC pqxx)
+target_link_libraries(DatabaseManager PUBLIC 
+    pqxx
+    UtilsLibs
+)
+
 target_include_directories(DatabaseManager PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/utils
 )
 
 set_target_properties(DatabaseManager PROPERTIES 

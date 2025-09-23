@@ -1,6 +1,9 @@
 #include "DatabaseManager.h"
 #include <iostream>
 #include <sstream>
+#include <algorithm>
+
+#include <boost/algorithm/string/join.hpp>
 
 DatabaseManager::DatabaseManager(const DbInfo& db_info) {
     config_.host = db_info.host;
@@ -75,7 +78,7 @@ bool DatabaseManager::testConnection() {
 void DatabaseManager::closeConnection() {
     std::lock_guard<std::mutex> lock(conn_mutex_);
     if (conn_ && conn_->is_open()) {
-        conn_->disconnect();
+        conn_->close();
         std::cout << "Database connection closed." << std::endl;
     }
 }
@@ -187,10 +190,13 @@ bool DatabaseManager::storeWordFrequencies(int page_id, const std::vector<Indexi
         txn.exec(insert_query.str());
         txn.commit();
         return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error storing word frequencies: " << e.what() << std::endl;
+        return false;
     }
 }
 
-std::vector<RelevanceSearchResult> DatabaseManager::searchPagesByRelevance(const std::vector<std::string> &words, bool require_all_words, int limit)
+std::vector<DatabaseManager::RelevanceSearchResult> DatabaseManager::searchPagesByRelevance(const std::vector<std::string> &words, bool require_all_words, int limit)
 {
     std::vector<RelevanceSearchResult> results;
     if (words.empty() || !conn_ || !conn_->is_open()) return results;
@@ -247,7 +253,7 @@ std::vector<RelevanceSearchResult> DatabaseManager::searchPagesByRelevance(const
         // Подготовка параметров запроса
         pqxx::params params;
         for (const auto &word : words) { // Добавляем слова в нижнем регистре
-            params.append(boost::algorithm::to_lower_copy(word));
+            params.append(boost::locale::to_lower(word));
         }
         if (require_all_words) { 
             params.append(static_cast<int>(words.size()));

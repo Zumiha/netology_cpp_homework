@@ -14,6 +14,7 @@
 #include "HTTPUtils.h"
 #include "HtmlParser.h"
 #include "Indexer.h"
+#include "DatabasePool.h"
 
 class webCrawler {
 public:

@@ -52,7 +52,7 @@ public:
     bool storeWordFrequencies(int page_id, const std::vector<Indexing::WordFrequency>& frequencies);
     
     // Поисковые запросы
-    std::vector<RelevanceSearchResult> searchPagesByRelevance(const std::vector<std::string>& words, bool require_all_words, int limit = 10);
+    std::vector<DatabaseManager::RelevanceSearchResult> searchPagesByRelevance(const std::vector<std::string>& words, bool require_all_words, int limit = 10);
     // std::vector<Indexing::WordFrequency> getPageWordFrequencies(int page_id);
     
     // Статистика

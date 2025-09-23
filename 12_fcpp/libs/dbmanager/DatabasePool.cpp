@@ -66,7 +66,7 @@ void DatabasePool::workerLoop(size_t worker_id) {
     std::vector<CrawlResult> batch;
     batch.reserve(10); // Пакетная обработка по 10 задач
     
-    while (!shutdown_requested_) {
+    while (!shutdown_requested_.load() || !pending_results_.empty()) { // Продолжаем, пока не запрошено завершение и есть задачи
         batch.clear();        
         CrawlResult result("", "", "", {});
         bool got_result = false;
