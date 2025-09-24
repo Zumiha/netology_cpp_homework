@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include "DatabaseManager.h"
 #include "SafeQueue.h"
 #include <thread>
@@ -19,6 +20,8 @@ public:
         const std::string& content,
         const std::vector<Indexing::WordFrequency>& frequencies
     );
+    
+    void queueResult(const CrawlResult &_res);
 
     // Остановска для безопасного завершения потоков
     void shutdown();

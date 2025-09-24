@@ -26,7 +26,7 @@ DatabasePool::DatabasePool(const DatabaseManager::Config &config, size_t worker_
 }
 
 DatabasePool::~DatabasePool() {
-    shutdown();
+    shutdown();    
 }
 
 void DatabasePool::queueResult(const std::string &url, const std::string &title, const std::string &content, const std::vector<Indexing::WordFrequency> &frequencies) {
@@ -34,6 +34,15 @@ void DatabasePool::queueResult(const std::string &url, const std::string &title,
         throw std::runtime_error("Cannot queue results after shutdown has been requested.");
     }
     pending_results_.push(CrawlResult(url, title, content, frequencies));
+}
+
+void DatabasePool::queueResult(const CrawlResult &_res)
+{
+    if (shutdown_requested_) {
+        throw std::runtime_error("Cannot queue results after shutdown has been requested.");
+    }
+    std::cout << "\nAttemnt to push data to results queue..\n" << std::endl;
+    pending_results_.push(_res);
 }
 
 void DatabasePool::shutdown() {

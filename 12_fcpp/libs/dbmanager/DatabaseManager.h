@@ -21,6 +21,11 @@ public:
         std::string password = "admin";
         int max_connections = 10;
         std::chrono::seconds connection_timeout{30};
+
+        Config() = default;
+        Config(const DbInfo& db_info)
+            : host(db_info.host), port(db_info.port), dbname(db_info.dbname),
+              user(db_info.user), password(db_info.password) {}
     };
 
     struct RelevanceSearchResult {
