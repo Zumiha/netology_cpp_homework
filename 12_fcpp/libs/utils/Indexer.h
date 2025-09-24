@@ -34,7 +34,6 @@ public:
     size_t getTotalWordCount() const; // Всего слов обработано
     size_t getWordFrequency(const std::string& word) const; // Кол-во определенного слова
 
-    std::string prepareSqlInsertStatement(const std::string& table_name = "word_frequencies") const;    // Подготовка SQL-запроса
     std::vector<std::pair<std::string, size_t>> getSqlParameterPairs() const;   // Подготовка вставки для параметризованных запросов
 
 private:

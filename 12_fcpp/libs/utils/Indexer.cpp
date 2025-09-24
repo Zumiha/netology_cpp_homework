@@ -64,21 +64,6 @@ size_t TextIndexer::getWordFrequency(const std::string& word) const {
     return (it != word_frequencies_.end()) ? it->second : 0;
 }
 
-std::string TextIndexer::prepareSqlInsertStatement(const std::string& table_name) const {
-    std::ostringstream oss;
-    oss << "INSERT INTO " << table_name << " (word, frequency) VALUES ";
-    
-    bool first = true;
-    for (const auto& pair : word_frequencies_) {
-        if (!first) oss << ", ";
-        oss << "('" << escapeSqlString(pair.first) << "', " << pair.second << ")";
-        first = false;
-    }
-    oss << ";";
-    
-    return oss.str();
-}
-
 std::vector<std::pair<std::string, size_t>> TextIndexer::getSqlParameterPairs() const {
     std::vector<std::pair<std::string, size_t>> result;
     result.reserve(word_frequencies_.size());
