@@ -26,7 +26,6 @@ DatabasePool::DatabasePool(const DatabaseManager::Config &config, size_t worker_
 }
 
 DatabasePool::~DatabasePool() {
-    std::cout << "Destroying DatabasePool..." << std::endl;
     shutdown();    
 }
 
@@ -34,7 +33,6 @@ void DatabasePool::queueResult(const std::string &url, const std::string &title,
     if (shutdown_requested_) {
         throw std::runtime_error("Cannot queue results after shutdown has been requested.");
     }
-    std::cout << "\nAttemnt to push data to results queue..\n" << std::endl;
     pending_results_.push(CrawlResult(url, title, content, frequencies));
 }
 
@@ -43,7 +41,6 @@ void DatabasePool::queueResult(const CrawlResult &_res)
     if (shutdown_requested_) {
         throw std::runtime_error("Cannot queue results after shutdown has been requested.");
     }
-    std::cout << "\nAttemnt to push data to results queue..\n" << std::endl;
     pending_results_.push(_res);
 }
 
@@ -89,7 +86,6 @@ void DatabasePool::workerLoop(size_t worker_id) {
         if (!batch.empty()) {
             if (processBatch(db, batch)) {
                 processed_count_ += batch.size();
-                std::cout << "Worker " << worker_id << " processed batch of " << batch.size() << " results. Total processed: " << processed_count_.load() << std::endl;
             } else {
                 std::cerr << "Worker " << worker_id << " failed to process batch." << std::endl;
             }   
@@ -103,15 +99,9 @@ void DatabasePool::workerLoop(size_t worker_id) {
 bool DatabasePool::processBatch(DatabaseManager &db, std::vector<CrawlResult> &batch) {
     try {
         bool all_success = true;
-        int successful_inserts = 0;
-        std::cout << "\nProcessing batch of size: " << batch.size() << std::endl;
         for (const auto& result : batch) {
             // Вставка страницы
-            std::cout << "\nInserting page: " << result.url;
-            std::cout << "\nTitle: " << result.title;
-            std::cout << "\nContent: present" << std::endl;
             auto page_id = db.insertPage(result.url, result.title, result.content);
-            std::cout << "\nPage ID: " << page_id.value() << std::endl;
             
             if (!page_id.has_value()) {
                 std::cerr << "Failed to insert page for URL: " << result.url << std::endl;
@@ -128,7 +118,6 @@ bool DatabasePool::processBatch(DatabaseManager &db, std::vector<CrawlResult> &b
                 std::cerr << "Failed to store word frequencies for URL: " << result.url << std::endl;
                 all_success = false;
             }
-            std::cout << "Successfull inserts: " << ++successful_inserts << std::endl;
         }        
         return all_success;
     } catch (const std::exception &e) {

@@ -27,9 +27,7 @@ webCrawler::webCrawler(int argc, char* argv[])
 
 webCrawler::~webCrawler()
 {
-    std::cout << "Destroying webCrawler..." << std::endl;
     stopCrawling(); // а деструктор ThreadPool соединит потоки
-
     if (db_pool_) {
         db_pool_->shutdown(); // Ждем оконачание работы с базой данных
     }
@@ -186,13 +184,6 @@ void webCrawler::crawlUrl(UrlInfo url_data)
         parsed_content->body_text, 
         indexer.getWordFrequenciesSorted()
     };
-
-    std::cout << 
-        "\nData preparation for DB" <<
-        "\nurl: " << data_for_database.url <<
-        "\npage title: " << data_for_database.title <<
-        "\ncontent has value: " << !data_for_database.content.empty() <<
-        "\nnumber of words: " << data_for_database.word_frequencies.size() << std::endl;
 
     // Добавление результата в очередь на запись в базу данных
     db_pool_->queueResult(data_for_database);
