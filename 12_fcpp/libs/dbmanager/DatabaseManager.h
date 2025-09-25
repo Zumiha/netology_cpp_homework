@@ -74,23 +74,4 @@ private:
     // Запросы создания таблиц
     static const std::string CREATE_PAGES_TABLE;
     static const std::string CREATE_WORDS_TABLE;
-    // static const std::string CREATE_PAGE_WORDS_TABLE;
 };
-
-// Многопоточный пул соединений (не реализован)
-// class DatabasePool {
-// public:
-//     explicit DatabasePool(const DatabaseManager::Config& config, size_t pool_size = 5);
-//     ~DatabasePool();
-    
-//     std::shared_ptr<DatabaseManager> getConnection();
-//     void returnConnection(std::shared_ptr<DatabaseManager> db);
-    
-// private:
-//     DatabaseManager::Config config_;
-//     std::queue<std::shared_ptr<DatabaseManager>> available_connections_;
-//     std::mutex pool_mutex_;
-//     std::condition_variable pool_cv_;
-//     size_t pool_size_;
-//     size_t active_connections_;
-// };

@@ -26,6 +26,7 @@ DatabasePool::DatabasePool(const DatabaseManager::Config &config, size_t worker_
 }
 
 DatabasePool::~DatabasePool() {
+    std::cout << "Destroying DatabasePool..." << std::endl;
     shutdown();    
 }
 
@@ -33,6 +34,7 @@ void DatabasePool::queueResult(const std::string &url, const std::string &title,
     if (shutdown_requested_) {
         throw std::runtime_error("Cannot queue results after shutdown has been requested.");
     }
+    std::cout << "\nAttemnt to push data to results queue..\n" << std::endl;
     pending_results_.push(CrawlResult(url, title, content, frequencies));
 }
 
@@ -78,21 +80,19 @@ void DatabasePool::workerLoop(size_t worker_id) {
     while (!shutdown_requested_.load() || !pending_results_.empty()) { // Продолжаем, пока не запрошено завершение и есть задачи
         batch.clear();        
         CrawlResult result("", "", "", {});
-        bool got_result = false;
 
-        if (pending_results_.pop(result)) {
+        // Собираем пакет задач
+        while (batch.size() < 10 && pending_results_.pop(result)) {
             batch.push_back(std::move(result));
-            got_result = true;
-
-            // Пытаемся набрать пакет до 10 задач
-            while (batch.size() < 10 && pending_results_.pop(result)) {
-                batch.push_back(std::move(result));
-            }
         }
-        if (got_result) {
+
+        if (!batch.empty()) {
             if (processBatch(db, batch)) {
                 processed_count_ += batch.size();
-            }
+                std::cout << "Worker " << worker_id << " processed batch of " << batch.size() << " results. Total processed: " << processed_count_.load() << std::endl;
+            } else {
+                std::cerr << "Worker " << worker_id << " failed to process batch." << std::endl;
+            }   
         } else if (!shutdown_requested_.load()) {
             // Нет задач, небольшой сон чтобы не крутить цикл впустую
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -103,8 +103,15 @@ void DatabasePool::workerLoop(size_t worker_id) {
 bool DatabasePool::processBatch(DatabaseManager &db, std::vector<CrawlResult> &batch) {
     try {
         bool all_success = true;
+        int successful_inserts = 0;
+        std::cout << "\nProcessing batch of size: " << batch.size() << std::endl;
         for (const auto& result : batch) {
+            // Вставка страницы
+            std::cout << "\nInserting page: " << result.url;
+            std::cout << "\nTitle: " << result.title;
+            std::cout << "\nContent: present" << std::endl;
             auto page_id = db.insertPage(result.url, result.title, result.content);
+            std::cout << "\nPage ID: " << page_id.value() << std::endl;
             
             if (!page_id.has_value()) {
                 std::cerr << "Failed to insert page for URL: " << result.url << std::endl;
@@ -121,8 +128,9 @@ bool DatabasePool::processBatch(DatabaseManager &db, std::vector<CrawlResult> &b
                 std::cerr << "Failed to store word frequencies for URL: " << result.url << std::endl;
                 all_success = false;
             }
-        }
-
+            std::cout << "Successfull inserts: " << ++successful_inserts << std::endl;
+        }        
+        return all_success;
     } catch (const std::exception &e) {
         std::cerr << "Error processing batch: " << e.what() << std::endl;
         return false;

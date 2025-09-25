@@ -13,30 +13,40 @@ webCrawler::webCrawler(int argc, char* argv[])
     }
     this->setSearchSettings();
 
-    // Initialize thread pool
+    // Инициализация пула рабочих потоков
     this->work_pool = std::make_unique<ThreadPool>(); // ThreadPool заинициализирует рабочие потоки
-    // ThreadPool using number of threads according to std::thread::hardware_concurrency()
+    // ThreadPool использует количество потоков согласно std::thread::hardware_concurrency()
     std::cout << "Initialized ThreadPool with " << std::thread::hardware_concurrency() << " threads" << std::endl;
+
+    // Инициализация пула соединений с базой данных
+    DatabaseManager::Config db_config(this->search_settings.db_connection);
+    this->db_pool_ = std::make_unique<DatabasePool>(db_config, 2); // 2 рабочих потока для базы данных
+    !this->db_pool_ ? throw std::runtime_error("Failed to initialize Database Pool") : std::cout << "Database Pool initialized successfully\n" << std::endl;
+
 }
 
 webCrawler::~webCrawler()
 {
-    stopCrawling();
-    // а деструктор ThreadPool соединит потоки
+    std::cout << "Destroying webCrawler..." << std::endl;
+    stopCrawling(); // а деструктор ThreadPool соединит потоки
+
+    if (db_pool_) {
+        db_pool_->shutdown(); // Ждем оконачание работы с базой данных
+    }
     std::cout << "Crawling completed!" << std::endl;
 }
 
 void webCrawler::startCrawling()
 {
     if (is_running.load()) {
-        std::cout << "Crawler is already running!" << std::endl;
+        std::cout << "!!!...Crawler is already running...!!!" << std::endl;
         return;
     }
     
     is_running.store(true);
     should_stop.store(false);
     
-    std::cout << "Starting web crawling..." << std::endl;
+    std::cout << "=== Starting web crawling ===" << std::endl;
     std::cout << "Initial URL: " << search_settings.url.url_link_info->link << std::endl;
     std::cout << "Max depth: " << search_settings.search_depth_max << std::endl;
     std::cout << "Max pages: " << search_settings.max_pages << "\n" << std::endl;
@@ -78,13 +88,6 @@ void webCrawler::startCrawling()
         }
         
         std::this_thread::sleep_for(std::chrono::milliseconds(100)); // without sleep premature destructor call. why? who knows.
-
-        // std::cout << "\nshould stop? - " << should_stop.load();
-        // std::cout << "\nactive workers: " << active_workers.load();
-        // std::cout << "\npending count: " << pending_count.load();
-        // std::cout << "\npage limit?: " << (total_pages_crawled.load() > search_settings.max_pages);
-        // std::cout << std::endl;
-
     }
     
     // Wait for all active workers to finish
@@ -100,18 +103,6 @@ void webCrawler::stopCrawling()
 {  
     should_stop.store(true);
     is_running.store(false);
-
-    // std::cout << "\n\nText from pages:\n";
-    // bool queue_not_empty = {true};
-    // int i = 0;
-    // std::string text;
-    // while (queue_not_empty) {   
-    //     queue_not_empty = page_text.pop(text);
-    //     if (!queue_not_empty) break;
-    //     i++;
-    //     std::cout << "\nPage " << i << " text:\n";
-    //     std::cout << text << std::endl;
-    // } 
 }
 
 void webCrawler::printSettings()
@@ -169,6 +160,7 @@ void webCrawler::crawlUrl(UrlInfo url_data)
     // Проверяем ограничение по страницам
     if (total_pages_crawled.load() >= search_settings.max_pages) {
         std::cout << "Reached maximum pages limit" << std::endl;
+        should_stop.store(true);
         return;
     }
 
@@ -181,17 +173,32 @@ void webCrawler::crawlUrl(UrlInfo url_data)
         return;
     }
 
-    total_pages_crawled++;
     
     // Обработка страницы в структуру ParsedContent, в которой есть отформатированные ссылки и текст со станицы
     auto parsed_content = HtmlParser::processHtml(content, url_data.url_link_info.value(), url_data.search_depth);
-
+    
     TextIndexer indexer; // Индексация слов
     indexer.indexContent(parsed_content->body_text); 
-    auto frequencies = indexer.getWordFrequenciesSorted(); 
-    auto page_adress = url_data.url_link_info->adress; // Адрес страницы 
     
-    auto sql_req = indexer.prepareSqlInsertStatement();
+    CrawlResult data_for_database = {
+        url_data.url_link_info->adress, 
+        parsed_content->page_title, 
+        parsed_content->body_text, 
+        indexer.getWordFrequenciesSorted()
+    };
+
+    std::cout << 
+        "\nData preparation for DB" <<
+        "\nurl: " << data_for_database.url <<
+        "\npage title: " << data_for_database.title <<
+        "\ncontent has value: " << !data_for_database.content.empty() <<
+        "\nnumber of words: " << data_for_database.word_frequencies.size() << std::endl;
+
+    // Добавление результата в очередь на запись в базу данных
+    db_pool_->queueResult(data_for_database);
+    
+    total_pages_crawled++;
+    total_words_indexed =+ data_for_database.word_frequencies.size();
 
     std::cout << "Completed: " << url_data.url_link_info->link << " (pages: " << total_pages_crawled.load() << ")" << std::endl;
     std::cout << "Total pages crawled: " << total_pages_crawled.load() << std::endl;

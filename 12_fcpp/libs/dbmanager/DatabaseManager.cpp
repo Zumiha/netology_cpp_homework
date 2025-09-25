@@ -33,10 +33,7 @@ bool DatabaseManager::initialize() {
             std::cerr << "Failed to open database connection." << std::endl;
             return false;
         }
-
-        std::cout << "Connected to database: " << conn_->dbname() << std::endl;
-        return createTables();
-        
+        return createTables();        
     } catch (const std::exception& e) {
         std::cerr << "Database connection error: " << e.what() << std::endl;
         return false;
@@ -48,11 +45,9 @@ bool DatabaseManager::createTables() {
         pqxx::work txn(*conn_);
         txn.exec(CREATE_PAGES_TABLE);
         txn.exec(CREATE_WORDS_TABLE);
-        // txn.exec(CREATE_PAGE_WORDS_TABLE);
-        // txn.exec(CREATE_INDEXES);
-        
+
         txn.commit();
-        std::cout << "Database tables created/verified successfully" << std::endl;
+
         return true;
     } catch (const std::exception& e) {
         std::cerr << "Error creating tables: " << e.what() << std::endl;
@@ -92,23 +87,23 @@ std::optional<int> DatabaseManager::insertPage(const std::string& url, const std
                 return std::nullopt;
             }
         }
-        pqxx::work txn(*conn_);
-        
+        pqxx::work txn(*conn_);        
         std::string content_hash = std::to_string(std::hash<std::string>{}(content));
         std::string query = R"(
-        INSERT INTO pages (url, title, content_hash)
-        VALUES ($1, $2, $3)
-        ON CONFLICT (url) DO UPDATE SET
-            title = EXCLUDED.title,
-            content_hash = EXCLUDED.content_hash
-        )";
+            INSERT INTO pages (url, title, content_hash)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (url) DO UPDATE SET
+                title = EXCLUDED.title,
+                content_hash = EXCLUDED.content_hash
+            RETURNING id
+            )";
         
         pqxx::result insert_result = txn.exec_params(query, url, title, content_hash);
         txn.commit();
-
+        
         if (!insert_result.empty()) {
             return insert_result[0][0].as<int>();
-        } 
+        }
         return std::nullopt;
 
     } catch (const std::exception& e) {
@@ -336,13 +331,3 @@ const std::string DatabaseManager::CREATE_WORDS_TABLE = R"(
         UNIQUE(page_id, word)
     )
 )";
-
-// const std::string DatabaseManager::CREATE_PAGE_WORDS_TABLE = R"(
-//     CREATE TABLE IF NOT EXISTS page_words (
-//         id SERIAL PRIMARY KEY,
-//         page_id INTEGER REFERENCES pages(id) ON DELETE CASCADE,
-//         word_id INTEGER REFERENCES words(id) ON DELETE CASCADE,
-//         frequency INTEGER NOT NULL DEFAULT 1,
-//         UNIQUE(page_id, word_id)
-//     )
-// )";

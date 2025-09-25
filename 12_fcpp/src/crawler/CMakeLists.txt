@@ -16,7 +16,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     IniParser 
     SafeThreadPool
     UtilsLibs
-    DatabaseManager  
+    pqxx
+    DatabaseManager
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC 

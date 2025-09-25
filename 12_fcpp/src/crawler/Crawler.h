@@ -64,9 +64,6 @@ private:
     std::atomic<int> total_words_indexed{0};
     std::mutex count_mutex;
 
-    // Indexer
-    // std::unique_ptr<TextIndexer> Indexer;
-
-    //Tests
-    SafeQueue<std::string> page_text;
+    // Database
+    std::unique_ptr<DatabasePool> db_pool_;
 };
