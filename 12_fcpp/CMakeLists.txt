@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(WebCrawler VERSION 0.1 LANGUAGES CXX)
+project(SearchAndCrawl VERSION 0.5 LANGUAGES CXX)
 
 #set(CMAKE_AUTOUIC ON)
 #set(CMAKE_AUTOMOC ON)
@@ -25,19 +25,28 @@ set(PROJECT_SOURCES
         main.cpp
 )
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/parser iniparses-build)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/parser iniparses-build)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/secqueue)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/crawler)
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/crawler)
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
-
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE 
-        CrawlerDaemon
+# add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+add_executable(WebCrawler 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/crawler/Crawler.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/crawler/Crawler.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/crawler/main_crawl.cpp
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/crawler
+# set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
+set_property(TARGET WebCrawler PROPERTY CXX_STANDARD 20)
+
+# target_link_libraries(${PROJECT_NAME} PRIVATE CrawlerDaemon)
+target_link_libraries(WebCrawler PRIVATE CrawlerDaemon)
+
+# target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/crawler)
+target_include_directories(WebCrawler PRIVATE 
+	${CMAKE_CURRENT_SOURCE_DIR}/src/crawler
+	${CMAKE_CURRENT_SOURCE_DIR}/libs/secqueue
 )
