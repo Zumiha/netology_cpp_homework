@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20.0)
 project(DbManager VERSION 1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
@@ -9,28 +9,44 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(SOURCE_LIB DatabaseManager.cpp DatabasePool.cpp)
 set(SOURCE_HD DatabaseManager.h DatabasePool.h)
 
-# Find libpqxx
+# Find libpqxx and parser
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../parser)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../libpqxx)
-# if(NOT TARGET pqxx)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../libpqxx libpqxx-build)
-# endif()
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../utils)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../parser iniparses-build)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../libpqxx libpqxx-build)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../utils utils-build)
+
 
 add_library(DatabaseManager STATIC ${SOURCE_LIB} ${SOURCE_HD})
 
 target_compile_features(DatabaseManager PRIVATE cxx_std_17)
 target_link_libraries(DatabaseManager PRIVATE pqxx)
 target_link_libraries(DatabaseManager PUBLIC
+    IniParser
     UtilsLibs
     SafeThreadPool
+    BoostInterface  # Boost interface library from UtilsLibs
 )
 
+# Verify Boost path exists
+if(EXISTS "C:/CLibs/boost/boost/locale.hpp")
+    message(STATUS "Boost locale.hpp found at expected location")
+else()
+    message(FATAL_ERROR "Boost locale.hpp NOT found at C:/CLibs/boost/boost/locale.hpp")
+endif()
 
 target_include_directories(DatabaseManager PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/utils
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/secqueue
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/libpqxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/../utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/../secqueue
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libpqxx
+    ${CMAKE_CURRENT_SOURCE_DIR}/../parser
+    "C:/CLibs/boost"
 )
+
+target_include_directories(DatabaseManager PRIVATE "C:/CLibs/boost")
 
 set_target_properties(DatabaseManager PROPERTIES 
     VERSION ${PROJECT_VERSION}
