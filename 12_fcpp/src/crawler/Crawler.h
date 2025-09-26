@@ -38,8 +38,6 @@ protected:
 private:
     void crawlUrl(UrlInfo url_data);
     
-    void indexWords(const std::string& content, const std::string& url);
-    
     // Configuration
     CrawlParams search_settings;
     std::unique_ptr<IniParser> parser;
