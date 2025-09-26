@@ -10,6 +10,9 @@ public:
 
 	void work();
 	void submit(std::function<void()>&& func);
+
+	int getCPUcount() {return cpu_count;}
+	int getQueueSize() {return work_queue.size();}
 private:
 	std::atomic<bool> is_complete{ false };
 	const int cpu_count = std::thread::hardware_concurrency();
