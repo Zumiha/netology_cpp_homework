@@ -198,101 +198,93 @@ std::vector<DatabaseManager::RelevanceSearchResult> DatabaseManager::searchPages
 
     try {
         std::lock_guard<std::mutex> lock(conn_mutex_);
-        pqxx::nontransaction nontxn(*conn_);
+        pqxx::work txn(*conn_);
+
+        // Создание списка строчных слов для SQL IN условия
+        std::ostringstream in_clause;
+        for (size_t i = 0; i < words.size(); ++i) {
+            if (i > 0) in_clause << ", ";
+
+            // Manual lowercase conversion to avoid boost::locale issues
+            std::string word_lower = words[i];
+            std::transform(word_lower.begin(), word_lower.end(), word_lower.begin(),
+                [](unsigned char c){ return std::tolower(c); });
+            in_clause << txn.quote(word_lower);
+        }
 
         std::ostringstream query;
-        
-        // Создание таблицы с найденными словами
         query << R"(
             WITH word_matches AS (
                 SELECT p.id AS page_id, p.url, p.title, wf.word, wf.frequency
                 FROM word_frequencies wf
                 JOIN pages p ON wf.page_id = p.id
-                WHERE LOWER(wf.word) IN (
-        )";
-        
-        // Добавление слов в запрос (по размеру вектора words)
-        for (size_t i = 0; i < words.size(); ++i) {
-            if (i > 0) query << ", ";
-            query << "$" << (i + 1);
-        }
-
-        // Продолжение запроса. Создание агрегированной таблицы и пар слово-частота
-        query << R"(
-                )
+                WHERE LOWER(wf.word) IN ()" << in_clause.str() << R"()
             ),
             page_relevance AS (
-                SELECT page_id, url, title, SUM(frequency) AS total_relevance, COUNT(DISTINCT word) AS unique_words_found,
-                ARRAY_AGG((word || ':' || frequency::text ORDER BY frequency DESC)) AS word_freq_pairs
+                SELECT page_id, url, title, 
+                       SUM(frequency) AS total_relevance, 
+                       COUNT(DISTINCT word) AS unique_words_found,
+                       ARRAY_AGG(word || ':' || frequency::text ORDER BY frequency DESC) AS word_freq_pairs
                 FROM word_matches 
                 GROUP BY page_id, url, title
-        )"; 
+            )
+        )";
 
-        // Запрос с условием на количество уникальных слов
         if (require_all_words) {
-            query << R"(
-            SELECT page_id, url, title, total_relevance, word_freq_pairs
-            FROM page_relevance
-            WHERE unique_words_found = $)" << (words.size() + 1) << R"(
-            ORDER BY total_relevance DESC
-            LIMIT $)" << (words.size() + 2);
+            query << " SELECT page_id, url, title, total_relevance, word_freq_pairs"
+                  << " FROM page_relevance"
+                  << " WHERE unique_words_found = " << words.size()
+                  << " ORDER BY total_relevance DESC"
+                  << " LIMIT " << limit;
         } else {
-            query << R"(
-            SELECT page_id, url, title, total_relevance, word_freq_pairs
-            FROM page_relevance
-            ORDER BY total_relevance DESC
-            LIMIT $)" << (words.size() + 1) << R"(
-            )";
+            query << " SELECT page_id, url, title, total_relevance, word_freq_pairs"
+                  << " FROM page_relevance"
+                  << " ORDER BY total_relevance DESC"
+                  << " LIMIT " << limit;
         }
+        pqxx::result result = txn.exec(query.str());
+        txn.commit();
 
-        // Подготовка параметров запроса
-        pqxx::params params;
-        for (const auto &word : words) { // Добавляем слова в нижнем регистре
-            params.append(boost::locale::to_lower(word));
-        }
-        if (require_all_words) { 
-            params.append(static_cast<int>(words.size()));
-        }
-        params.append(static_cast<int>(limit)); // Лимит результатов
-        
-        auto result = nontxn.exec_params(query.str(), params); 
-
-        // Обработка результатов. Заполнение массива структур RelevanceSearchResult
         for (const auto &row : result) {
             RelevanceSearchResult res;
+            
+            try {
+                // Заполнение структуры основными полями
+                res.page_id = row["page_id"].as<int>();
+                res.url = row["url"].as<std::string>();
+                res.title = row["title"].as<std::string>();
+                res.total_relevance = row["total_relevance"].as<int>();
+                std::string word_freq_array = row["word_freq_pairs"].as<std::string>();
+                
+                // Удаление фигурных скобок
+                if(word_freq_array.front() == '{') word_freq_array.erase(0, 1);
+                if(word_freq_array.back() == '}') word_freq_array.pop_back();
 
-            // Заполнение структуры основными полями
-            res.page_id = row["page_id"].as<int>();
-            res.url = row["url"].as<std::string>();
-            res.title = row["title"].as<std::string>();
-            res.total_relevance = row["total_relevance"].as<int>();
+                std::istringstream ss(word_freq_array);
+                std::string pair;
+                while (std::getline(ss, pair, ',')) {
+                    // Удаление кавычек, если есть
+                    if(!pair.empty() && pair.front() == '"') pair.erase(0, 1);
+                    if(!pair.empty() && pair.back() == '"') pair.pop_back();
 
-            // Разбор массива word_freq_pairs
-            std::string word_freq_array = row["word_freq_pairs"].as<std::string>();
-            // Удаление фигурных скобок
-            if(word_freq_array.front() == '{') word_freq_array.erase(0, 1);
-            if(word_freq_array.back() == '}') word_freq_array.pop_back();
-
-            // Разделение по запятым
-            std::istringstream ss(word_freq_array);
-            std::string pair;
-
-            while (std::getline(ss, pair, ',')) {
-                // Удаление кавычек, если есть
-                if(word_freq_array.front() == '"') pair.erase(0, 1);
-                if(word_freq_array.back() == '"') pair.pop_back();
-
-                // Разделение слова и частоты по двоеточию
-                size_t delim_pos = pair.find(':');
-                if (delim_pos != std::string::npos) {
-                    std::string word = pair.substr(0, delim_pos);
-                    int frequency = std::stoi(pair.substr(delim_pos + 1));
-                    // Добавление в вектор пар слово-частота
-                    res.word_frequencies.emplace_back(word, frequency);
+                    // Разделение слова и частоты по двоеточию
+                    size_t delim_pos = pair.find(':');
+                    if (delim_pos != std::string::npos) {
+                        std::string word = pair.substr(0, delim_pos);
+                        int frequency = std::stoi(pair.substr(delim_pos + 1));
+                        // Добавление в вектор пар слово-частота
+                        res.word_frequencies.emplace_back(word, frequency);
+                    }
                 }
+                
+                results.push_back(std::move(res));
+                
+            } catch (const std::exception& e) {
+                std::cerr << "Error parsing individual row: " << e.what() << std::endl;
+                throw;
             }
-            results.push_back(std::move(res));
         }
+
     } catch (const std::exception &e) {
         std::cerr << "Relevance search error: " << e.what() << std::endl;
     }

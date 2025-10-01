@@ -14,11 +14,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../parser)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../libpqxx)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../utils)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../parser iniparses-build)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../libpqxx libpqxx-build)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../utils utils-build)
-
-
 add_library(DatabaseManager STATIC ${SOURCE_LIB} ${SOURCE_HD})
 
 target_compile_features(DatabaseManager PRIVATE cxx_std_17)
@@ -39,10 +34,11 @@ endif()
 
 target_include_directories(DatabaseManager PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../utils
-    ${CMAKE_CURRENT_SOURCE_DIR}/../secqueue
-    ${CMAKE_CURRENT_SOURCE_DIR}/../libpqxx
     ${CMAKE_CURRENT_SOURCE_DIR}/../parser
+    ${CMAKE_CURRENT_SOURCE_DIR}/../secqueue
+    ${CMAKE_CURRENT_SOURCE_DIR}/../utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/../libpqxx/includes
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../libpqxx
     "C:/CLibs/boost"
 )
 
