@@ -17,6 +17,3 @@ void ThreadPool::work() {
 		else {std::this_thread::yield();}
 	}
 }
-void ThreadPool::submit(std::function<void()>&& func) {
-	work_queue.push(std::forward<std::function<void()>>(func));
-}

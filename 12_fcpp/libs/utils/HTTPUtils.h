@@ -45,8 +45,6 @@ private:
     static std::optional<std::string> handleHttps(net::io_context& ioc, Link& currentUrl, int& redirectCount, const Config& config);
     static std::optional<std::string> handleHttp(net::io_context& ioc, Link& currentUrl, int& redirectCount, const Config& config);
 
-
-
     template<typename ResponseType>
     static std::optional<Link> handleRedirect(const ResponseType& response, const Link& currentUrl, int redirectCount, const Config& config) {
         if (!config.followRedirects || !isRedirectResponse(response.result_int())) {

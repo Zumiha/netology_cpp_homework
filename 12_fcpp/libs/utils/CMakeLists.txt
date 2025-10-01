@@ -8,8 +8,8 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(BOOST_ROOT "C:/CLibs/boost")
 set(BOOST_INCLUDEDIR "${BOOST_ROOT}")
 set(BOOST_LIBRARYDIR "${BOOST_ROOT}/stage/lib")
-# set(Boost_USE_STATIC_LIBS ON)
-#set(BOOST_INCLUDE "${BOOST_ROOT}/include")
+
+
 #Check if headers exist
 if (NOT EXISTS "${BOOST_ROOT}/boost/locale.hpp")
 	message(FATAL_ERROR "Boost headers not found at ${BOOST_ROOT}/boost/")
@@ -19,6 +19,7 @@ endif()
 file(GLOB BOOST_SYSTEM_LIB "${BOOST_ROOT}/stage/lib/libboost_system*.dll")
 file(GLOB BOOST_FILESYSTEM_LIB "${BOOST_ROOT}/stage/lib/libboost_filesystem*.dll")
 file(GLOB BOOST_LOCALE_LIB "${BOOST_ROOT}/stage/lib/libboost_locale*.dll")
+file(GLOB BOOST_BEAST_LIB "${BOOST_ROOT}/stage/lib/libboost_beast*.dll")
 
 # file(GLOB BOOST_SYSTEM_LIB "${BOOST_ROOT}/stage/lib/libboost_system*.a")
 # file(GLOB BOOST_FILESYSTEM_LIB "${BOOST_ROOT}/stage/lib/libboost_filesystem*.a")
@@ -26,21 +27,20 @@ file(GLOB BOOST_LOCALE_LIB "${BOOST_ROOT}/stage/lib/libboost_locale*.dll")
 
 if (NOT BOOST_SYSTEM_LIB OR NOT BOOST_FILESYSTEM_LIB OR NOT BOOST_LOCALE_LIB)
 	message (FATAL_ERROR "One of more Boost libraries not found in ${BOOST_LIBRARYDIR}")
-	# message(STATUS "Looking for: libboost_*system*.lib, libboost_*filesystem*.lib, libboost_*locale*.lib")
 endif()
-
-# message(STATUS "Found Boost libraries:")
-# message(STATUS "System: ${BOOST_SYSTEM_LIB}")
-# message(STATUS "Filesystem: ${BOOST_FILESYSTEM_LIB}")
-# message(STATUS "Locale: ${BOOST_LOCALE_LIB}")
 
 # Create Boost interface library for shared configuration
 add_library(BoostInterface INTERFACE)
-target_include_directories(BoostInterface INTERFACE "${BOOST_ROOT}")
+target_include_directories(BoostInterface INTERFACE 
+    "${BOOST_ROOT}"
+    "${BOOST_ROOT}/boost"  # Add Beast include
+)
+
 target_link_libraries(BoostInterface INTERFACE 
     ${BOOST_SYSTEM_LIB}
     ${BOOST_FILESYSTEM_LIB}
     ${BOOST_LOCALE_LIB}
+    ${BOOST_BEAST_LIB}
 )
 
 set(SOURCE_LIB UrlParser.cpp HTTPUtils.cpp HtmlParser.cpp Indexer.cpp)
