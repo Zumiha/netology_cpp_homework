@@ -7,7 +7,6 @@ int main(int argc, char* argv[]) {
         std::cout << "Creating crawler";
         spider.startCrawling();
         std::cout << "\n...Crawler destroyed....\n";
-
     }
     catch (const std::exception& ex) {
         std::cout << ex.what() << std::endl;

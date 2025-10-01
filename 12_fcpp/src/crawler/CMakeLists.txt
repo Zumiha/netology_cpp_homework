@@ -8,8 +8,6 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(SOURCE_HD Crawler.h)
 set(SOURCE_LIB Crawler.cpp)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../libs/dbmanager DatabaseManager-build)
-
 add_library(${PROJECT_NAME} STATIC ${SOURCE_LIB} ${SOURCE_HD})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC 

@@ -8,6 +8,7 @@ project(SearchAndCrawl VERSION 0.5 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+# set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
@@ -25,28 +26,42 @@ set(PROJECT_SOURCES
         main.cpp
 )
 
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/parser iniparses-build)
+# shared libraries subdirectories
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/parser)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/secqueue)
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/utils)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/libpqxx)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/dbmanager)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/serverutils)
 
+# project subdirectories
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/crawler)
-# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/crawler)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/searchengine)
 
-# add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 add_executable(WebCrawler 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/crawler/Crawler.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/crawler/Crawler.h
         ${CMAKE_CURRENT_SOURCE_DIR}/src/crawler/main_crawl.cpp
 )
 
-# set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
+add_executable(WebSearch
+       ${CMAKE_CURRENT_SOURCE_DIR}/src/searchengine/SearchEngine.cpp
+       ${CMAKE_CURRENT_SOURCE_DIR}/src/searchengine/SearchEngine.h
+       ${CMAKE_CURRENT_SOURCE_DIR}/src/searchengine/main_search.cpp
+)
+
 set_property(TARGET WebCrawler PROPERTY CXX_STANDARD 20)
+set_property(TARGET WebSearch PROPERTY CXX_STANDARD 20)
 
-# target_link_libraries(${PROJECT_NAME} PRIVATE CrawlerDaemon)
 target_link_libraries(WebCrawler PRIVATE CrawlerDaemon)
+# target_link_libraries(WebSearch PUBLIC UtilsLibs)
+target_link_libraries(WebSearch PRIVATE SearchEngine)
 
-# target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/crawler)
+
 target_include_directories(WebCrawler PRIVATE 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/crawler
-	${CMAKE_CURRENT_SOURCE_DIR}/libs/secqueue
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/crawler
+)
+
+target_include_directories(WebSearch PRIVATE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/searchengine
 )
